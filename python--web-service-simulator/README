@@ -13,7 +13,7 @@ that - it is a building block that provides some VERY basic boiler-plate code to
 on a specific port and having a specific path to POST items to.
 
 Upon receiving a POST request, the web server logs the incoming request event. It then injects a
-random/artificial delay to simulate processing, and logs the event corresponding to sending the message
+random/artificial delay to simulate processing, and will log the event corresponding to sending the message
 to the next/downstream consumer.
 
 Note that this project can also be configured as the first/last web service processor in a pipeline.
