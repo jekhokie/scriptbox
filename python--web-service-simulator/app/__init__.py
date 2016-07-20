@@ -25,7 +25,7 @@ if not os.path.exists(log_directory):
 
 # set up the custom log to record transaction IDs
 log_file = "{}/{}.log".format(log_directory, app.config['LISTEN_PATH'])
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(role)s - %(event)s - Trans. ID [%(transaction_id)s] - %(message)s")
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - Role: %(role)s - Event: %(event)s - Trans. ID: [%(transaction_id)s] - %(message)s")
 handler = RotatingFileHandler(log_file, maxBytes=10000, backupCount=20)
 handler.setLevel(logging.INFO)
 handler.setFormatter(formatter)
