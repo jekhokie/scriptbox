@@ -44,6 +44,7 @@ Install the required environment and libraries:
 ```bash
 $ virtualenv --no-site-packages --distribute .env
 $ source .env/bin/activate
+$ export CC=/usr/bin/gcc     # set this to wherever your C-compiler is located
 $ pip install -r requirements.txt
 ```
 
@@ -57,9 +58,9 @@ $ cp instance/config.py.sample instance/config.py
 ## Usage
 
 Now that the configurations are in place, run the script to start the web service.
-Note that you can use CTRL-C to terminate the endless loop.
+Note that you can use CTRL-C to terminate the instance.
 
 ```bash
-$ python run_web_service.py
+$ python run.py
 # you should see output corresponding to the request/response sequence
 ```
