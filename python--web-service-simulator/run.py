@@ -11,14 +11,14 @@ if app.config['ROLE'] == 'Injector':
     transaction_id = randint(1, 1000000)
 
     # simulate being the first service in a pipeline to receive a request
-    app.logger.info('Received Request', extra={'event': 'RECEIVED', 'transaction_id': transaction_id})
+    app.logger.info('Received Request', extra={'role': app.config['ROLE'], 'event': 'RECEIVED', 'transaction_id': transaction_id})
 
     # inject an artificial delay between 100-300ms into the cycle to simulate "processing"
     ms_delay = (randint(100, 300) / 1000.0)
     time.sleep(ms_delay)
 
     # record completing and passing the request downstream
-    app.logger.info('Processed Request', extra={'event': 'PROCESSED', 'transaction_id': transaction_id})
+    app.logger.info('Processed Request', extra={'role': app.config['ROLE'], 'event': 'PROCESSED', 'transaction_id': transaction_id})
 
     # send the transaction to the next service processor
     payload = {'transaction_id': transaction_id}
