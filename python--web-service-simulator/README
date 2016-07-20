@@ -50,8 +50,8 @@ $ pip install -r requirements.txt
 Create a configuration file from the sample and specify the values for your specific environment.
 
 ```bash
-$ cp config/settings.yml.sample config/settings.yml
-# edit the config/settings.yml file for your environment
+$ cp instance/config.py.sample instance/config.py
+# edit the instance/config.py file for your environment
 ```
 
 ## Usage
