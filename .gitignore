@@ -1,0 +1,12 @@
+# ignore vim temp files
+*.swp
+*.swo
+
+# ignore any Mac-related files
+*DS_Store
+
+# ignore any environment specific files
+*settings.yml
+*settings.json
+*settings.csv
+*settings.xml
