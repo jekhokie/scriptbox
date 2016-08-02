@@ -14,7 +14,8 @@ import yaml
 with open('config/settings.yml', 'r') as yml:
     config = yaml.load(yml)
 
-# construct the required headers for requests
+# construct the required url and headers for requests
+check_url = "{}/checks".format(config['api_url'])
 headers = {
     'App-Key': config['app_key'],
     'Account-Email': config['account_email']
@@ -23,12 +24,36 @@ headers = {
 # demo 1, get a list of all checks and print status information
 print "############################################################"
 print "Getting check counts..."
-check_url = "{}/checks".format(config['api_url'])
+
+# make request and parse response
 r = requests.get(check_url, auth=(config['username'], config['password']), headers=headers)
 res = r.json()
 
+# handle errors
 if 'error' in res:
     raise Exception("Received exception '{}'".format(res['error']['errormessage']))
 
+# print check information
 for check in res['checks']:
     print "{}: {}".format(check['name'], check['status'])
+
+# demo 2, create a basic ping check against github.com
+print "############################################################"
+print "Creating a check..."
+
+# construct the new check payload
+payload = {
+    'name': '1-new-check',
+    'host': 'www.github.com',
+    'type': 'ping'
+}
+
+# make request and parse response
+r = requests.post(check_url, auth=(config['username'], config['password']), headers=headers, data=payload)
+
+# handle errors
+if 'error' in res:
+    raise Exception("Received exception '{}'".format(res['error']['errormessage']))
+
+# print the new check information
+print(r.json())
