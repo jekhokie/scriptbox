@@ -43,8 +43,8 @@ print "Creating a check..."
 
 # construct the new check payload
 payload = {
-    'name': '1-new-check',
-    'host': 'www.github.com',
+    'name': config['check_name'],
+    'host': config['ping_host'],
     'type': 'ping'
 }
 

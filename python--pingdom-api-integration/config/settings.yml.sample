@@ -3,3 +3,5 @@ username:      '<AUTH_USERNAME>'                 # basic auth username
 password:      '<AUTH_PASSWORD>'                 # basic auth password
 app_key:       '<APP_KEY>'                       # registered application key
 account_email: '<ACCOUNT_EMAIL>'                 # email of the profile to interact with
+check_name:    '1-new-check'                     # name of check to create
+ping_host:     'github.com'                      # host to configure ping check for
