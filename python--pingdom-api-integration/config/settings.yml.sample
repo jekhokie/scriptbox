@@ -1,0 +1,5 @@
+api_url:       'https://api.pingdom.com/api/2.0' # API endpoint to communicate with
+username:      '<AUTH_USERNAME>'                 # basic auth username
+password:      '<AUTH_PASSWORD>'                 # basic auth password
+app_key:       '<APP_KEY>'                       # registered application key
+account_email: '<ACCOUNT_EMAIL>'                 # email of the profile to interact with
