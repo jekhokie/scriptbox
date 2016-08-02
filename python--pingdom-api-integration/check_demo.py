@@ -50,10 +50,11 @@ payload = {
 
 # make request and parse response
 r = requests.post(check_url, auth=(config['username'], config['password']), headers=headers, data=payload)
+res = r.json()
 
 # handle errors
 if 'error' in res:
     raise Exception("Received exception '{}'".format(res['error']['errormessage']))
 
 # print the new check information
-print(r.json())
+print(res.json())
