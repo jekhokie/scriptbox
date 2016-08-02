@@ -22,16 +22,15 @@ $ pip install -r requirements.txt
 Create a configuration file from the sample and specify the values for your specific environment.
 
 ```bash
-$ cp config/config.py.sample instance/config.py
-# edit the instance/config.py file for your environment
+$ cp config/settings.yml.sample config/settings.yml
+# edit the config/config.yml file for your environment
 ```
 
 ## Usage
 
-Now that the configurations are in place, run the script to start the web service.
-Note that you can use CTRL-C to terminate the instance.
+Now that the configurations are in place, run the script to interact with the Pingdom service.
 
 ```bash
-$ python create_check.py
+$ python check_demo.py
 # you should see output corresponding to the request/response sequence
 ```
