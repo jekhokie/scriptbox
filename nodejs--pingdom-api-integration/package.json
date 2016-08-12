@@ -1,0 +1,24 @@
+{
+  "name": "nodejs--pingdom-api-integration",
+  "version": "1.0.0",
+  "description": "NodeJS integration with the Pingdom API.",
+  "main": "make-request.js",
+  "dependencies": {
+    "dotenv": "^2.0.0",
+    "request": "^2.74.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/jekhokie/scriptbox.git"
+  },
+  "author": "Justin Karimi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jekhokie/scriptbox/issues"
+  },
+  "homepage": "https://github.com/jekhokie/scriptbox#readme"
+}
