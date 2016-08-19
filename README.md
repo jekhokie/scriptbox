@@ -7,3 +7,8 @@ knowledge and promote code re-use or serve as a knowledge base for future projec
 Note that this repository is assumed to be language agnostic. Whenever a new script or
 project folder is added, it is added with a corresponding README.md file that contains
 information about the intent of the submitted project.
+
+## License
+
+All sub-directories contained within created by the author are licensed under the
+LICENSE.txt contents unless specified otherwise.
