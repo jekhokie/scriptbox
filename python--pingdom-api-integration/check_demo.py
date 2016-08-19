@@ -57,4 +57,4 @@ if 'error' in res:
     raise Exception("Received exception '{}'".format(res['error']['errormessage']))
 
 # print the new check information
-print(res.json())
+print(res)
