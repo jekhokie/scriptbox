@@ -21,7 +21,7 @@ Create a configuration file from the sample and specify the values for your spec
 
 ```bash
 $ cp config/.env.sample config/.env
-# edit the config/config.yml file for your environment
+# edit the config/.env file for your environment
 $ chmod 600 config/.env
 # lock down the file as it contains sensitive information
 ```
