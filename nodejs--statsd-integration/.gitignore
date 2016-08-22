@@ -1,0 +1,5 @@
+# NodeJS packages
+node_modules
+
+# environment-specific settings
+config/.env
