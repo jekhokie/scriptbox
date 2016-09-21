@@ -31,6 +31,6 @@ $ chmod 600 config/.env
 Now that the configurations are in place, run the script to interact with the Pingdom service.
 
 ```bash
-$ node make-request.js
+$ nodejs make-request.js
 # you should see output corresponding to the request/response sequence
 ```

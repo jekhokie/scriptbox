@@ -60,6 +60,6 @@ $ chmod 600 config/.env
 Now that the configurations are in place, run the script to interact with the Statsd service.
 
 ```bash
-$ node submit-metric.js
+$ nodejs submit-metric.js
 # you should see output corresponding to the request/response sequence
 ```
