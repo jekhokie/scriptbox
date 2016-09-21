@@ -1,0 +1,24 @@
+{
+  "name": "nodejs--mssql-to-statsd",
+  "version": "1.0.0",
+  "description": "NodeJS script to query a MSSQL database and send statistics/metrics to a Statsd endpoint.",
+  "main": "perform-queries.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/jekhokie/scriptbox.git"
+  },
+  "author": "Justin Karimi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jekhokie/scriptbox/issues"
+  },
+  "homepage": "https://github.com/jekhokie/scriptbox#readme",
+  "dependencies": {
+    "dotenv": "^2.0.0",
+    "mssql": "^3.3.0",
+    "statsd-client": "^0.2.2"
+  }
+}
