@@ -35,7 +35,7 @@ Once the Java application has been compiled, you can run it to retrieve the last
 (as defined in the CONFIGURATION section of the class definition) via the following:
 
 ```bash
-java -cp "lib/rrd4j-3.0.jar:." RRD4JReader
+$ java -cp "lib/rrd4j-3.0.jar:build/:." RRD4JReader
 # should output data like the following:
 #   Start Time: 1474565534
 #   End Time: 1474565544
