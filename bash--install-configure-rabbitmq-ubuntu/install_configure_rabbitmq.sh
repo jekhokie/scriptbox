@@ -1,6 +1,10 @@
 #!/bin/bash
-
-# Environment settings - configure to match your environment
+#
+# Purpose: Install and configure a RabbitMQ instance. This script can be run either on a single
+#          node (declared 'master') or a series of nodes that can enable clustering capabilities.
+#
+# Environment Settings: Configure to match your environment
+#
 # CLUSTER_FQDNS:   Fully-qualified domain names of the hosts in the cluster - make sure that
 #                  the names are in fact fully qualified for your environment as this is the
 #                  most capable way to accommodate successful clustering.
@@ -12,7 +16,7 @@
 #                  current FQDN matches the MASTER_FQDN parameter, but there is no guarantee that
 #                  the node FQDN matches the MASTER_FQDN (it can be different).
 # ADMIN_PASSWORD:  Password desired for the 'admin' user to manage the RabbitMQ cluster.
-#
+
 CLUSTER_FQDNS="rabbit1.localhost,rabbit2.localhost,rabbit3.localhost"
 MASTER_FQDN="rabbit1.localhost"
 IS_MASTER=true
