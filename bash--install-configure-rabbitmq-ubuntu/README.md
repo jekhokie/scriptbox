@@ -34,7 +34,7 @@ set to match your environment - see the comments in the script for an explanatio
 setting.
 
 ```bash
-$ sudo vim install_configure_rabbitmq.sh
+$ vim install_configure_rabbitmq.sh
 # configure the up-front environment variables for your environment
 
 $ sudo ./install_configure_rabbitmq.sh
