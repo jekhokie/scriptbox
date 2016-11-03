@@ -1,6 +1,6 @@
 # Install and Configure RabbitMQ
 
-Bash script to install and configure a RabbitMQ cluster instance on an Ubuntu 14.04-based system.
+Bash script to install and configure a RabbitMQ cluster instance on an Ubuntu 16.04-based system.
 
 Note that this script was developed for and tested on an Ubuntu 16.04 installation - it may work on
 other versions of Ubuntu, but as always, YMMV.
