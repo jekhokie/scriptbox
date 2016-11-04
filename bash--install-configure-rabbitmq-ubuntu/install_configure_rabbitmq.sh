@@ -74,8 +74,12 @@ done
 clusterHosts="${clusterHosts}]"
 
 write_output "General package management update..."
-apt-get update 2&>/dev/null
-write_output "  Package management update complete."
+apt-get update &>/dev/null
+if [ $? -eq 0 ]; then
+    write_output "  Package management update complete."
+else
+    write_error "  Failed to make package management update."
+fi
 
 write_output "Checking for Erlang dependency..."
 apt list --installed erlang-nox -a 2>/dev/null | grep -i erlang &>/dev/null
