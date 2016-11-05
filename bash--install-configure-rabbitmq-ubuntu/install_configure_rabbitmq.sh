@@ -203,7 +203,7 @@ else
 fi
 
 # certain things should only occur on the master
-if [ "${IS_MASTER}" == true ]; then
+if [[ "x${IS_MASTER}" == "xtrue" ]]; then
     # this could also be done via placing '[rabbitmq_management].' in the file /etc/rabbitmq/enabled_plugins
     # if this occurred prior to the startup of the application
     write_output "Enabling the management plugin..."
@@ -309,7 +309,7 @@ fi
 
 write_summary "========================================================================="
 write_summary "Your RabbitMQ node configuration is complete!"
-if [ "${IS_MASTER}" == true ]; then
+if [[ "x${IS_MASTER}" == "xtrue" ]]; then
     write_summary "You should be able to access the management interface via the following URL:"
     write_summary "    http://<FQDN_OR_IP>:15672"
     write_summary "Log into the interface using the credentials 'admin'/'${ADMIN_PASSWORD}'"
