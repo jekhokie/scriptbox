@@ -1,0 +1,7 @@
+jira:
+  url:       "https://jiraurl/"                # URL of the Jira instance to query
+  user:      "jira_user"                       # username for the Jira user
+  pass:      "jira_pass"                       # password for the Jira user
+  jql_query: "project   = 'PRJ'  and
+              issueType = 'Task' and
+              component in ('Some Component')" # JQL query to perform
