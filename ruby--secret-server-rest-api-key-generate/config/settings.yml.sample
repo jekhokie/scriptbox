@@ -1,0 +1,24 @@
+---
+secret_server:
+  base_url:  'https://<SECRET_SERVER_HOSTNAME>'     # base URL to the Secret Server instance
+  wsdl_path: '/WebServices/SSWebService.asmx?wsdl'  # path to the WSDL hosted on the Secret Server instance
+  secret_path: '/SecretView.aspx?secretid='         # path to viewing a secret based on the ID
+auth:
+  username: '<AUTH_USER>'    # account username used to invoke creating a secret
+  password: '<AUTH_PASS>'    # account password used to invoke creating a secret
+  domain:   '<AUTH_DOMAIN>'  # domain to use for authentication
+settings:
+  secret_type_id: 6060        # ID for the secret template to be used
+  folder_id:      133         # ID of the folder to store the secret in
+key_name_field:         # ID, name and form display name for the 'key' form input
+  field_id:           503
+  field_name:         'Key Name'
+  field_display_name: 'Key Name'
+key_password_field:     # ID, name and form display name for the 'password' form input
+  field_id:           504
+  field_name:         'Key Password'
+  field_display_name: 'Key Password'
+key_description_field:  # ID, name and form display name for the 'description' form input
+  field_id:           505
+  field_name:         'Description'
+  field_display_name: 'Description'
