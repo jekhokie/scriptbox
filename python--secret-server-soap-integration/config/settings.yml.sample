@@ -1,0 +1,9 @@
+secret_server:
+  wsdl_url:    'https://<SECRET_SERVER_HOSTNAME>/WebServices/SSWebService.asmx?wsdl'  # URL for the Secret Server WSDL
+  secret_id:   '<SECRET_ID>'  # the ID of the secret to retrieve
+                              # this can typically be obtained by viewing the secret details in a browser window
+                              # it is the 'secretid' query parameter at the end of the URL when viewing a secret
+  auth:
+    username: '<ACCESS_USERNAME>'  # username for the account to access the secret
+    password: '<ACCESS_PASSWORD>'  # password for the account to access the secret
+    domain:   '<DOMAIN>'           # domain to use for authentication
