@@ -1,0 +1,10 @@
+---
+vra_host:    ''                # hostname of the vRA instance
+vra_user:    ''                # username of the execution user
+vra_pass:    ''                # password for the execution user
+vra_tenant:  'vsphere.local'   # tenant for the vRA environment
+vra_bp_name: ''                # name of the blueprint to use to provision the VM
+
+provision_timeout_seconds: 360           # maximum seconds to query for status of completion before failing
+provision_success:         'SUCCESSFUL'  # status returned by vRA for provision completion
+...
