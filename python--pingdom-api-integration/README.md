@@ -23,7 +23,7 @@ Create a configuration file from the sample and specify the values for your spec
 
 ```bash
 $ cp config/settings.yml.sample config/settings.yml
-# edit the config/config.yml file for your environment
+# edit the config/settings.yml file for your environment
 ```
 
 ## Usage
