@@ -72,6 +72,22 @@ def get_vm_status(auth_token, request_id):
     request_status = requests.request("GET", url, headers=create_headers(auth_token), verify=False)
     return request_status
 
+# get the resources associated with the request made (VM)
+def get_vm_details(auth_token, request_id):
+    url = "https://{}/catalog-service/api/consumer/requests/{}/resources".format(config['vra_host'], request_id)
+    request_resources = requests.request("GET", url, headers=create_headers(auth_token), verify=False)
+
+    # get the Destroy ID and VM Name using list comprehension
+    meta_dict = [element for element in request_resources.json()['content'] if element['providerBinding']['providerRef']['label'] == 'Infrastructure Service'][0]
+    destroy_id = meta_dict['id']
+    vm_name = meta_dict['name']
+
+    # get the VM IP address using list comprehension
+    vm_data = [element for element in meta_dict['resourceData']['entries'] if element['key'] == 'ip_address'][0]
+    vm_ip = vm_data['value']['value']
+
+    return (destroy_id, vm_name, vm_ip)
+
 #################################
 # main execution
 # Steps:
@@ -80,32 +96,27 @@ def get_vm_status(auth_token, request_id):
 #   3. Get specific catalog item ID based on inventory item name.
 #   4. Get template JSON for catalog item ID.
 #   5. Request VM using template JSON.
-#   6. TODO: RETURN VM IP ADDRESS AND DESTROY ID
+#   6. Return Destroy ID, VM Name, and VM IP Address.
 #################################
 
-# get a bearer token
 print "############################################################"
 print "Getting a bearer token..."
 auth_token = get_token()
 
-# get an inventory of available catalog items and set catalog ID based on desired blueprint
 print "############################################################"
 print "Getting an inventory of available catalog items and finding '{}'...".format(config['vra_bp_name'])
 inventory = get_inventory(auth_token)
 catalog_id = inventory[config['vra_bp_name']]
 
-# get template JSON for catalog item ID
 print "############################################################"
 print "Getting the template JSON for the requested catalog item ID..."
 template_json = get_template_json(auth_token, catalog_id)
 
-# request VM using template JSON
 print "############################################################"
 print "Making the request for the VM to be created..."
 request_id = create_vm_from_template(auth_token, catalog_id, template_json)
 print("Request submitted - ID: {}".format(request_id))
 
-# get status of VM build - iterate every X seconds until finished, with maximum TIMEOUT
 print "############################################################"
 print "Checking on the status of the VM build request..."
 timer = 0
@@ -117,8 +128,16 @@ while True:
     if timer >= config['provision_timeout_seconds']:
         raise Exception("Timeout attempting to wait {} seconds for VM to finish provisioning!".format(config['provision_timeout_seconds']))
     elif status.json()['state'] == config['provision_success']:
-        print('VM is ready!')
+        print("VM is ready - took roughly {} seconds".format(timer))
         break
 
-    time.sleep(10)
-    timer += 10
+    # iterate on wait timing
+    time.sleep(15)
+    timer += 15
+
+print "############################################################"
+print "Getting VM information..."
+destroy_id, vm_name, vm_ip = get_vm_details(auth_token, request_id)
+print("Destroy ID: {}".format(destroy_id))
+print("VM Name: {}".format(vm_name))
+print("VM IP: {}".format(vm_ip))
