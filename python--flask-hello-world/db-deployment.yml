@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: db
+spec:
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - name: mysql
+        image: mysql
+        imagePullPolicy: Never
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: Passw0rd
+        ports:
+        - containerPort: 3306
+          name: db-container
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    app: db
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+    name: mysql
+  selector:
+    app: db
+  type: LoadBalancer
+...

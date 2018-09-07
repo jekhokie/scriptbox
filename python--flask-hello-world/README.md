@@ -30,3 +30,6 @@ $ python run.py
 
 You can now open a browser and navigate to http://<SERVER_IP>:8000/ to see the Hello World Flask
 basic website.
+
+Note that there are Kubernetes YAML configuration files in this directory due to this repo being
+used as part of a larger tutorial on Kubernetes.
