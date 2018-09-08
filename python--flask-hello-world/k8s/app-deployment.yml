@@ -11,7 +11,7 @@ spec:
       app: flask
   replicas: 3
   strategy:
-    type: Recreate
+    type: RollingUpdate
   template:
     metadata:
       labels:
