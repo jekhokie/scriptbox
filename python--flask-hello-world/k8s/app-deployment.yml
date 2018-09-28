@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: randomizer
+  labels:
+    app: flask
+spec:
+  selector:
+    matchLabels:
+      app: flask
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: flask
+    spec:
+      containers:
+      - name: randomizer
+        image: randomizer
+        imagePullPolicy: Never
+        env:
+        - name: MYSQL_DB_HOST
+          value: mysql
+        ports:
+        - containerPort: 8000
+          name: flask-container
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: randomizer
+  labels:
+    app: flask
+spec:
+  ports:
+  - port: 8000
+    protocol: TCP
+    name: flask
+  selector:
+    app: flask
+  type: LoadBalancer
+...
