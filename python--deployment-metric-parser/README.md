@@ -32,24 +32,38 @@ $ pip install -r requirements.txt
 ## Usage
 
 There is an `examples` directory which contains Excel files for playbooks in the format expected
-for the parser to operate correctly. The runbook must contain a single sheet/tab, and The runbooks
-columns should be, in left to right sequence:
+for the parser to operate correctly. The runbook columns should be, in left to right sequence:
 
 * Process Step: Alpha-indicated step in what is a process map detailing all respective steps
 for a deployment or activity to take place.
-* Step Number: Numerical/sequence for identification of step.
+* Task: Numerical/sequence for identification of specific task.
 * Step: Command or item to execute.
 * Estimated Start Time: When the step is estimated to be kicked off.
 * Estimated Stop Time: When the step is estimated to complete.
-* Start Time: Actual start time of executing the step.
-* Stop Time: Actual stop time when the step completed.
+* Assignee: Person assigned to execute the task.
+* Status: String-based indicator of state of the task (complete, in progress, etc.).
+* Actual Start Time: Actual start time of executing the step.
+* Actual Stop Time: Actual stop time when the step completed.
 * Notes: Aggregate notes, errors, and other useful information to inform the next iteration of
 the step in the playbook. Note that this MUST be contained to a single cell in the Excel document.
 
+Additionally, the runbook must have only a single tab, and all "Time" columns *must* be in a general
+data format, not a date/time format in order for this parser to work correctly.
+
+**WARNING**: This parser will skip *any* rows in a playbook that do not have a process step (first
+column) specified - this is a way to protect any extraneous rows and such that are not part of the
+actual execution.
+
 Take and make a copy of the playbook in the `examples` directory and copy it into the `tests`
-directory. The utility can be run without any changes to the sample playbook, but you are free to
-edit it and make as many copies/variations of the playbook as you wish. Once you have a copy of it
-in the `tests` directory, go ahead and run the utility:
+directory:
+
+```bash
+$ cp examples/Playbook_1_Sample.xlsx tests/Playbook1.xlsx
+```
+
+The utility can be run without any changes to the sample playbook, but you are free to edit it and
+make as many copies/variations of the playbook as you wish. Once you have a copy of it in the
+`tests` directory, go ahead and run the utility:
 
 ```bash
 $ python gather_metrics.py
@@ -58,3 +72,11 @@ $ python gather_metrics.py
 If all goes well, you should see various metrics that are output to the screen containing what can
 be useful information to inform where you should focus your efforts in further automating the manual
 steps or focusing on reducing the ovarall variation in the execution process.
+
+## Limitations
+
+This parser is a quick first-cut and can be expanded but has limitations:
+
+* Cannot handle complicated playbook workbooks that have multiple worksheets within - as of right now,
+this parser expects the workbook to only have a single worksheet which it parses the data from, or that
+the worksheet with the playbook is always the *first* worksheet in a sequence of multiples.
