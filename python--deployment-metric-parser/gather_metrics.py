@@ -55,6 +55,8 @@ def validate_columns(sheet):
 # purposes of calculating metrics - Excel reports "fraction of a day"
 # when retrieving a time cell, which needs to be converted into respective
 # hours, minutes, and seconds
+#
+# NOTE: Eventually explore xldate_as_tuple - will condense entire function
 def excel_time_to_datetime(t):
     if t.ctype == ExcelCellType.text:
         return datetime.strptime("".join(t.value.split()), "%I:%M%p")
@@ -75,13 +77,34 @@ def excel_time_to_datetime(t):
     else:
         raise(Exception("Expecting {} to be either a text or date type - received {} type".format(t.value, t.ctype)))
 
+# convert a date cell to a datetime object
+def excel_date_to_datetime(d):
+    if d.ctype == ExcelCellType.date:
+        print(d.value)
+        # convert respective components to hours and minutes (don't care about seconds
+        # as that is likely too granular to start - will just add percent error that will
+        # only be significant much later in the metric gathering)
+        seconds = round(t.value * 86400)
+        minutes, seconds = divmod(seconds, 60)
+        hours, minutes = divmod(minutes, 60)
+
+        return datetime.strptime("%d:%d" % (hours, minutes), "%H:%M")
+    else:
+        raise(Exception("Expecting {} to be either a text or date type - received {} type".format(t.value, t.ctype)))
+
 # parse all playbooks in directory - exclude tilde-starting files indicating
 # the file may be open for editing (not a valid use case)
 for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswith('~')]:
-    # open the file and get the first worksheet
+    # open the file and get the summary and playbook worksheets
     wb = xlrd.open_workbook(file)
-    sheet = wb.sheet_by_index(0)
-    steps = {}
+    summary = wb.sheet_by_name("Summary")
+    pb = {'customer': summary.cell(0, 1).value, 'date': summary.cell(1, 1).value, 'steps': {}}
+    sheet = wb.sheet_by_name("Playbook")
+
+    # get metadata about the deployment
+    pb['customer'] = summary.cell(0, 1).value
+    start_date = datetime(*xlrd.xldate_as_tuple(summary.cell(1, 1).value, wb.datemode))
+    pb['date'] = start_date.strftime("%m/%d/%y")
 
     # parse each step in the playbook
     for i in range(0, sheet.nrows):
@@ -102,11 +125,11 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
                     continue
                 else:
                     pmap = pmap.value.lower()
-                    if pmap not in steps:
-                        steps[pmap] = {'occurs': 1, 'cum_time': 0, 'min_time': None, 'min_step_number': '',
+                    if pmap not in pb['steps']:
+                        pb['steps'][pmap] = {'occurs': 1, 'cum_time': 0, 'min_time': None, 'min_step_number': '',
                                        'max_time': None, 'max_step_number': '', 'avg_time': 0, 'notes': ''}
                     else:
-                        steps[pmap]['occurs'] += 1
+                        pb['steps'][pmap]['occurs'] += 1
 
                 # get actual start and end times
                 t_start = excel_time_to_datetime(actual_vals[ColNames.act_start])
@@ -120,7 +143,7 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
                 t_delta = (t_end - t_start).total_seconds() / 60.0
 
                 # easier variables
-                step = steps[pmap]
+                step = pb['steps'][pmap]
                 task_number = actual_vals[ColNames.task].value
 
                 # add cumulative time and notes
@@ -150,5 +173,11 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
             raise(Exception("ERROR: {} has error: {}".format(file, e.message)))
 
     # output the final metrics
-    for key in sorted(steps):
-        print "%s %s" % (key, steps[key])
+    print("---------------------------------------------------")
+    print("CUSTOMER: {0:<s}".format(pb['customer']))
+    print("DATE:     {0:<s}".format(pb['date']))
+    print("TIMINGS (IN MINUTES):")
+    for key in sorted(pb['steps']):
+        p = pb['steps'][key]
+        print("  - {0:s} | CUM: {1:>4.0f} | AVG: {2:>4.0f} | MIN: {2:>4.0f} | MAX: {3:>4.0f}".format(key, p['cum_time'], p['avg_time'], p['min_time'], p['max_time']))
+    print("---------------------------------------------------")

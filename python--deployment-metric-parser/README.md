@@ -47,8 +47,11 @@ for a deployment or activity to take place.
 * Notes: Aggregate notes, errors, and other useful information to inform the next iteration of
 the step in the playbook. Note that this MUST be contained to a single cell in the Excel document.
 
-Additionally, the runbook must have only a single tab, and all "Time" columns *must* be in a general
-data format, not a date/time format in order for this parser to work correctly.
+Additionally, there are some requirements in order for the playbook to work with the parser:
+
+* Playbook must have (minimum) 2 tabs named "Summary" and "Playbook" respectively.
+* Playbook must follow the same format/fields as exist in the sample playbook in the `examples`
+directory.
 
 **WARNING**: This parser will skip *any* rows in a playbook that do not have a process step (first
 column) specified - this is a way to protect any extraneous rows and such that are not part of the
@@ -80,3 +83,5 @@ This parser is a quick first-cut and can be expanded but has limitations:
 * Cannot handle complicated playbook workbooks that have multiple worksheets within - as of right now,
 this parser expects the workbook to only have a single worksheet which it parses the data from, or that
 the worksheet with the playbook is always the *first* worksheet in a sequence of multiples.
+* Does not yet do aggregation across playbooks (you will end up with separate metric objects per
+playbook, which may/may not be useful to you).
