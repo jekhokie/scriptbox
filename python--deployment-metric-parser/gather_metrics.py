@@ -103,7 +103,8 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
 
     # get metadata about the deployment
     pb['customer'] = summary.cell(0, 1).value
-    start_date = datetime(*xlrd.xldate_as_tuple(summary.cell(1, 1).value, wb.datemode))
+    pb['environment'] = summary.cell(1, 1).value
+    start_date = datetime(*xlrd.xldate_as_tuple(summary.cell(2, 1).value, wb.datemode))
     pb['date'] = start_date.strftime("%m/%d/%y")
 
     # parse each step in the playbook
@@ -174,8 +175,9 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
 
     # output the final metrics
     print("---------------------------------------------------")
-    print("CUSTOMER: {0:<s}".format(pb['customer']))
-    print("DATE:     {0:<s}".format(pb['date']))
+    print("CUSTOMER:    {0:<s}".format(pb['customer']))
+    print("ENVIRONMENT: {0:<s}".format(pb['environment']))
+    print("DATE:        {0:<s}".format(pb['date']))
     print("TIMINGS (IN MINUTES):")
     for key in sorted(pb['steps']):
         p = pb['steps'][key]
