@@ -30,11 +30,16 @@ class ColNames(Enum):
     status = 6
     act_start = 7
     act_end = 8
-    notes = 9
+    act_minutes = 9
+    errors = 10
+    notes = 11
 
 # store the expected columns in the Excel document
-EXPECTED_COLS = ["process step", "task", "step", "estimated start time", "estimated end time", "assignee",
-                 "status", "actual start time", "actual end time", "notes" ]
+EXPECTED_COLS = [ "process step", "task", "step", "estimated start time", "estimated end time", "assignee",
+                  "status", "actual start time", "actual end time", "actual duration (minutes)", "errors", "additional notes" ]
+
+# dict for storing the metrics
+pb = {}
 
 # validate that the playbook has the required columns and ordering required
 def validate_columns(sheet):
@@ -47,7 +52,7 @@ def validate_columns(sheet):
     # check each column name for validity/order
     i = 0
     for cell in cols:
-        if EXPECTED_COLS[i] != cell.value.lower():
+        if EXPECTED_COLS[i] != cell.value.lower().replace('\n', ' ').replace('\r', ' '):
             raise(Exception("Column '{}' in position {} does not match expected column '{}'".format(cell.value.lower(), i, EXPECTED_COLS[i])))
         i += 1
 
@@ -88,16 +93,21 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
     # open the file and get the summary and playbook worksheets
     wb = xlrd.open_workbook(file)
     summary = wb.sheet_by_name("Summary")
-    pb = {'customer': summary.cell(0, 1).value, 'date': summary.cell(1, 1).value, 'steps': {}}
     sheet = wb.sheet_by_name("Playbook")
 
-    # get metadata about the deployment
-    pb['customer'] = summary.cell(0, 1).value
-    pb['environment'] = summary.cell(1, 1).value
+    # pull metadata out of the worksheets
+    customer = summary.cell(0, 1).value
+    cust_env = summary.cell(1, 1).value
     start_date = datetime(*xlrd.xldate_as_tuple(summary.cell(2, 1).value, wb.datemode))
-    pb['date'] = start_date.strftime("%m/%d/%y")
-    pb['installer'] = summary.cell(5, 1).value
-    pb['lead'] = summary.cell(6, 1).value
+    started = start_date.strftime("%m/%d/%y")
+    installer_version = summary.cell(4, 1).value
+    lead_installer = summary.cell(5, 1).value
+
+    # create a deployment object for metric storage
+    current_pb = { 'installer': installer_version,
+                   'lead': lead_installer,
+                   'started': started,
+                   'steps': { } }
 
     # parse each step in the playbook
     for i in range(0, sheet.nrows):
@@ -113,37 +123,49 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
             try:
                 # get process step and initialize metrics
                 pmap = actual_vals[ColNames.procstep]
-                if pmap.ctype == ExcelCellType.blank or pmap.ctype == ExcelCellType.empty:
+                if pmap.ctype in {ExcelCellType.blank, ExcelCellType.empty}:
                     # if there is no process map step specified, skip this row
                     continue
                 else:
                     pmap = pmap.value.lower()
-                    if pmap not in pb['steps']:
-                        pb['steps'][pmap] = {'occurs': 1, 'cum_time': 0, 'min_time': None, 'min_step_number': '',
-                                       'max_time': None, 'max_step_number': '', 'avg_time': 0, 'notes': ''}
+                    if pmap not in current_pb['steps']:
+                        current_pb['steps'][pmap] = {'occurs': 1, 'cum_time': 0, 'min_time': None, 'min_step_number': '',
+                                                     'max_time': None, 'max_step_number': '', 'avg_time': 0, 'errors': '', 'notes': ''}
                     else:
-                        pb['steps'][pmap]['occurs'] += 1
+                        current_pb['steps'][pmap]['occurs'] += 1
 
-                # get actual start and end times
-                t_start = excel_time_to_datetime(actual_vals[ColNames.act_start])
-                t_end = excel_time_to_datetime(actual_vals[ColNames.act_end])
+                # get actual start and end times OR duration
+                start_time = actual_vals[ColNames.act_start]
+                end_time = actual_vals[ColNames.act_end]
+                actual_minutes = actual_vals[ColNames.act_minutes]
 
-                # handle when day rolls over to next day
-                if t_end < t_start:
-                    t_end += timedelta(days=1)
+                # determine whether to use minutes or timeframes
+                t_delta = 0
+                if start_time.ctype in {ExcelCellType.blank, ExcelCellType.empty} or end_time.ctype in {ExcelCellType.blank, ExcelCellType.empty}:
+                    if actual_minutes.ctype in {ExcelCellType.blank, ExcelCellType.empty}:
+                        raise(Exception("No start/end time or duration (minutes)"))
+                    else:
+                        t_delta = actual_minutes.value
+                else:
+                    t_start = excel_time_to_datetime(actual_vals[ColNames.act_start])
+                    t_end = excel_time_to_datetime(actual_vals[ColNames.act_end])
 
-                # calculate time delta for step
-                t_delta = (t_end - t_start).total_seconds() / 60.0
+                    # handle when day rolls over to next day
+                    if t_end < t_start:
+                        t_end += timedelta(days=1)
+
+                    # calculate time delta for step
+                    t_delta = (t_end - t_start).total_seconds() / 60.0
 
                 # easier variables
-                step = pb['steps'][pmap]
+                step = current_pb['steps'][pmap]
                 task_number = actual_vals[ColNames.task].value
 
-                # add cumulative time and notes
+                # add cumulative time, errors, and notes
                 step['cum_time'] += t_delta
-                ct = actual_vals[ColNames.notes].ctype
-                if ct != ExcelCellType.empty and ct != ExcelCellType.blank:
-                    step['notes'] += ">" + actual_vals[ColNames.notes].value
+                ct = actual_vals[ColNames.errors].ctype
+                if ct not in {ExcelCellType.empty, ExcelCellType.blank}:
+                    step['errors'] += ">" + actual_vals[ColNames.errors].value
 
                 # if time delta is greater than last known delta, specify this as longest
                 if t_delta > step['max_time'] or step['max_time'] is None:
@@ -157,23 +179,42 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
 
                 # update the average duration
                 step['avg_time'] = step['cum_time'] / step['occurs']
-
-                # calculate actual duration for step
-                print("[{}] -- {} - {} -- [{}]".format(pmap, t_start.strftime("%I:%M %p"), t_end.strftime("%I:%M %p"), t_delta))
             except Exception, e:
                 raise(Exception("Error on row {}: {}".format(i+1, e)))
         except Exception, e:
             raise(Exception("ERROR: {} has error: {}".format(file, e.message)))
 
-    # output the final metrics
-    print("---------------------------------------------------")
-    print("CUSTOMER:    {0:<s}".format(pb['customer']))
-    print("ENVIRONMENT: {0:<s}".format(pb['environment']))
-    print("DATE:        {0:<s}".format(pb['date']))
-    print("INSTALLER:   {0:<s}".format(pb['installer']))
-    print("LEAD:        {0:<s}".format(pb['lead']))
-    print("TIMINGS (IN MINUTES):")
-    for key in sorted(pb['steps']):
-        p = pb['steps'][key]
-        print("  - {0:s} | CUM: {1:>4.0f} | AVG: {2:>4.0f} | MIN: {2:>4.0f} | MAX: {3:>4.0f}".format(key, p['cum_time'], p['avg_time'], p['min_time'], p['max_time']))
-    print("---------------------------------------------------")
+    ######################
+    ### METRIC STORAGE ###
+    ######################
+    # check if the customer/environment already exists
+    if customer in pb:
+        if cust_env in pb[customer]:
+            # existing customer, existing environment - add deployment and assign for use
+            pb[customer][cust_env] += current_pb
+        else:
+            # existing customer, brand new environment - build environment from scratch
+            pb[customer][cust_env] = [ current_pb ]
+    else:
+        # brand new customer - build from scratch
+        pb[customer] = { cust_env: [ current_pb ] }
+
+##################
+# OUTPUT RESULTS #
+##################
+for cust in pb:
+    for env in pb[cust]:
+        deployments = pb[cust][env]
+
+        for deploy in deployments:
+            print("---------------------------------------------------")
+            print("CUSTOMER:      {0:<s}".format(cust))
+            print("ENVIRONMENT:   {0:<s}".format(env))
+            print("DATE:          {0:<s}".format(deploy['started']))
+            print("INSTALLER VER: {0:<s}".format(deploy['installer']))
+            print("LEAD:          {0:<s}".format(deploy['lead']))
+            print("TIMINGS (IN MINUTES):")
+            for key in sorted(deploy['steps']):
+                p = deploy['steps'][key]
+                print("  - {0:s} | CUM: {1:>4.0f} | AVG: {2:>4.0f} | MIN: {2:>4.0f} | MAX: {3:>4.0f}".format(key, p['cum_time'], p['avg_time'], p['min_time'], p['max_time']))
+            print("---------------------------------------------------")
