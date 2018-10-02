@@ -3,12 +3,22 @@
 # Purpose: Parse Excel documents in the tests directory and produce
 #          useful metrics for inspection.
 #
+# TODO: There are a lot of areas of improvement - specifically:
+#    - Validate summary worksheet exists, named "Summary", with required fields/values
+#    - Validate playbook worksheet exists, named "Playbook", with required columns
+#    - Validate task States worksheet exists (drop-downs for "Status" fields)
+#    - De-normalize playbook metrics - currently duplication for easily pulling data out/sorting
 
 import glob
 import os
 import xlrd
 from datetime import datetime, timedelta
 from enum import Enum
+from jinja2 import Environment, FileSystemLoader
+
+# name of the HTML file to output when rendering graphs
+input_html_j2 = "index.html.j2"
+output_html_file = "html_output/index.html"
 
 # classify each of the possible Excel Cell types
 class ExcelCellType(Enum):
@@ -85,11 +95,6 @@ def excel_time_to_datetime(t):
 # parse all playbooks in directory - exclude tilde-starting files indicating
 # the file may be open for editing (not a valid use case)
 for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswith('~')]:
-    # TODO: Validation for format expectations:
-    #    - Summary worksheet exists, named "Summary", with required fields/values
-    #    - Playbook worksheet exists, named "Playbook", with required columns
-    #    - Task States worksheet exists (drop-downs for "Status" fields)
-
     # open the file and get the summary and playbook worksheets
     wb = xlrd.open_workbook(file)
     summary = wb.sheet_by_name("Summary")
@@ -204,3 +209,11 @@ for deploy in sorted(pb, key=lambda k: k['started']):
         p = deploy['steps'][key]
         print("  - {0:s} | CUM: {1:>4.0f} | AVG: {2:>4.0f} | MIN: {2:>4.0f} | MAX: {3:>4.0f}".format(key, p['cum_time'], p['avg_time'], p['min_time'], p['max_time']))
     print("---------------------------------------------------")
+
+######################
+# OUTPUT HTML GRAPHS #
+######################
+j2_env = Environment(loader=FileSystemLoader("templates"), trim_blocks=True)
+template = j2_env.get_template(input_html_j2)
+with open(output_html_file, "wb") as fh:
+    fh.write(template.render(deployments=pb))
