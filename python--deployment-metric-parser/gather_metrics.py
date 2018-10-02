@@ -95,6 +95,11 @@ def excel_date_to_datetime(d):
 # parse all playbooks in directory - exclude tilde-starting files indicating
 # the file may be open for editing (not a valid use case)
 for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswith('~')]:
+    # TODO: Validation for format expectations:
+    #    - Summary worksheet exists, named "Summary", with required fields/values
+    #    - Playbook worksheet exists, named "Playbook", with required columns
+    #    - Task States worksheet exists (drop-downs for "Status" fields)
+
     # open the file and get the summary and playbook worksheets
     wb = xlrd.open_workbook(file)
     summary = wb.sheet_by_name("Summary")
@@ -106,6 +111,8 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
     pb['environment'] = summary.cell(1, 1).value
     start_date = datetime(*xlrd.xldate_as_tuple(summary.cell(2, 1).value, wb.datemode))
     pb['date'] = start_date.strftime("%m/%d/%y")
+    pb['installer'] = summary.cell(5, 1).value
+    pb['lead'] = summary.cell(6, 1).value
 
     # parse each step in the playbook
     for i in range(0, sheet.nrows):
@@ -178,6 +185,8 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
     print("CUSTOMER:    {0:<s}".format(pb['customer']))
     print("ENVIRONMENT: {0:<s}".format(pb['environment']))
     print("DATE:        {0:<s}".format(pb['date']))
+    print("INSTALLER:   {0:<s}".format(pb['installer']))
+    print("LEAD:        {0:<s}".format(pb['lead']))
     print("TIMINGS (IN MINUTES):")
     for key in sorted(pb['steps']):
         p = pb['steps'][key]
