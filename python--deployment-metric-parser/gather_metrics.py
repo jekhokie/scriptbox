@@ -77,21 +77,6 @@ def excel_time_to_datetime(t):
     else:
         raise(Exception("Expecting {} to be either a text or date type - received {} type".format(t.value, t.ctype)))
 
-# convert a date cell to a datetime object
-def excel_date_to_datetime(d):
-    if d.ctype == ExcelCellType.date:
-        print(d.value)
-        # convert respective components to hours and minutes (don't care about seconds
-        # as that is likely too granular to start - will just add percent error that will
-        # only be significant much later in the metric gathering)
-        seconds = round(t.value * 86400)
-        minutes, seconds = divmod(seconds, 60)
-        hours, minutes = divmod(minutes, 60)
-
-        return datetime.strptime("%d:%d" % (hours, minutes), "%H:%M")
-    else:
-        raise(Exception("Expecting {} to be either a text or date type - received {} type".format(t.value, t.ctype)))
-
 # parse all playbooks in directory - exclude tilde-starting files indicating
 # the file may be open for editing (not a valid use case)
 for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswith('~')]:
