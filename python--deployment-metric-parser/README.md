@@ -57,15 +57,17 @@ directory.
 column) specified - this is a way to protect any extraneous rows and such that are not part of the
 actual execution.
 
-Take and make a copy of the playbook in the `examples` directory and copy it into the `tests`
+Take and make a copy of the playbooks in the `examples` directory and copy them into the `tests`
 directory:
 
 ```bash
 $ cp examples/Playbook_1_Sample.xlsx tests/Playbook1.xlsx
+$ cp examples/Playbook_2_Sample.xlsx tests/Playbook2.xlsx
+$ cp examples/Playbook_3_Sample.xlsx tests/Playbook3.xlsx
 ```
 
-The utility can be run without any changes to the sample playbook, but you are free to edit it and
-make as many copies/variations of the playbook as you wish. Once you have a copy of it in the
+The utility can be run without any changes to the sample playbooks, but you are free to edit it and
+make as many copies/variations of the playbooks as you wish. Once you have a copy of them in the
 `tests` directory, go ahead and run the utility:
 
 ```bash

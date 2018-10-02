@@ -38,8 +38,8 @@ class ColNames(Enum):
 EXPECTED_COLS = [ "process step", "task", "step", "estimated start time", "estimated end time", "assignee",
                   "status", "actual start time", "actual end time", "actual duration (minutes)", "errors", "additional notes" ]
 
-# dict for storing the metrics
-pb = {}
+# array for storing the metrics about each deployment
+pb = []
 
 # validate that the playbook has the required columns and ordering required
 def validate_columns(sheet):
@@ -104,7 +104,9 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
     lead_installer = summary.cell(5, 1).value
 
     # create a deployment object for metric storage
-    current_pb = { 'installer': installer_version,
+    current_pb = { 'customer': customer,
+                   'env': cust_env,
+                   'installer': installer_version,
                    'lead': lead_installer,
                    'started': started,
                    'steps': { } }
@@ -184,37 +186,21 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
         except Exception, e:
             raise(Exception("ERROR: {} has error: {}".format(file, e.message)))
 
-    ######################
-    ### METRIC STORAGE ###
-    ######################
-    # check if the customer/environment already exists
-    if customer in pb:
-        if cust_env in pb[customer]:
-            # existing customer, existing environment - add deployment and assign for use
-            pb[customer][cust_env] += current_pb
-        else:
-            # existing customer, brand new environment - build environment from scratch
-            pb[customer][cust_env] = [ current_pb ]
-    else:
-        # brand new customer - build from scratch
-        pb[customer] = { cust_env: [ current_pb ] }
+    # store metrics for current deployment
+    pb.append(current_pb)
 
 ##################
 # OUTPUT RESULTS #
 ##################
-for cust in pb:
-    for env in pb[cust]:
-        deployments = pb[cust][env]
-
-        for deploy in deployments:
-            print("---------------------------------------------------")
-            print("CUSTOMER:      {0:<s}".format(cust))
-            print("ENVIRONMENT:   {0:<s}".format(env))
-            print("DATE:          {0:<s}".format(deploy['started']))
-            print("INSTALLER VER: {0:<s}".format(deploy['installer']))
-            print("LEAD:          {0:<s}".format(deploy['lead']))
-            print("TIMINGS (IN MINUTES):")
-            for key in sorted(deploy['steps']):
-                p = deploy['steps'][key]
-                print("  - {0:s} | CUM: {1:>4.0f} | AVG: {2:>4.0f} | MIN: {2:>4.0f} | MAX: {3:>4.0f}".format(key, p['cum_time'], p['avg_time'], p['min_time'], p['max_time']))
-            print("---------------------------------------------------")
+for deploy in sorted(pb, key=lambda k: k['started']):
+    print("---------------------------------------------------")
+    print("CUSTOMER:      {0:<s}".format(deploy['customer']))
+    print("ENVIRONMENT:   {0:<s}".format(deploy['env']))
+    print("DATE:          {0:<s}".format(deploy['started']))
+    print("INSTALLER VER: {0:<s}".format(deploy['installer']))
+    print("LEAD:          {0:<s}".format(deploy['lead']))
+    print("TIMINGS (IN MINUTES):")
+    for key in sorted(deploy['steps']):
+        p = deploy['steps'][key]
+        print("  - {0:s} | CUM: {1:>4.0f} | AVG: {2:>4.0f} | MIN: {2:>4.0f} | MAX: {3:>4.0f}".format(key, p['cum_time'], p['avg_time'], p['min_time'], p['max_time']))
+    print("---------------------------------------------------")
