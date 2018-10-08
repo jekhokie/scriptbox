@@ -12,9 +12,14 @@
 import glob
 import os
 import xlrd
+import yaml
 from datetime import datetime, timedelta
 from enum import Enum
 from jinja2 import Environment, FileSystemLoader
+
+# load configuration settings
+with open('config/settings.yml', 'r') as yml:
+  config = yaml.load(yml)
 
 # name of the HTML file to output when rendering graphs
 input_html_j2 = "index.html.j2"
@@ -227,8 +232,9 @@ colors = [ 'rgb(255, 99, 132)',
            'rgb(153, 102, 255)',
            'rgb(201, 203, 207)' ]
 
-# create labels for the last 30 days of calendar
-date_labels = [(datetime.today() + timedelta(days=-x)).strftime("%m/%d/%y") for x in range(30, 0, -1)]
+# create labels for the last 30 days of calendar from end date
+end_date = datetime.strptime(config['end_date'], "%m/%d/%y")
+date_labels = [(end_date + timedelta(days=-x)).strftime("%m/%d/%y") for x in range(config['graph_days'], 0, -1)]
 
 # parse each step into an object for both date-focused as well as step-focused
 data_by_date = {}

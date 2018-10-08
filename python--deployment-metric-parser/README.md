@@ -66,6 +66,10 @@ $ cp examples/Playbook_2_Sample.xlsx tests/Playbook2.xlsx
 $ cp examples/Playbook_3_Sample.xlsx tests/Playbook3.xlsx
 ```
 
+**NOTE** If you wish to adjust the dates for the graphs, please edit the `config/settings.yml` file
+prior to proceeding. Otherwise, if you're just using the sample playbooks out of the box, the settings
+in the `settings.yml` file should suffice.
+
 The utility can be run without any changes to the sample playbooks, but you are free to edit it and
 make as many copies/variations of the playbooks as you wish. Once you have a copy of them in the
 `tests` directory, go ahead and run the utility:
