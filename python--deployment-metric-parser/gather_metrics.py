@@ -273,13 +273,25 @@ metadata = {
            }
 
 # GRAPH 1: PIE CHART WITH BREAKDOWN OF PER-PROCESS-STEP TOTAL MINUTES
+# GRAPH 3: "AVERAGES" ON A POLAR CHART FOR EACH PROCESS STEP
 pie_data = []
 pie_colors = []
 pie_labels = []
+polar_data = []
+polar_colors = []
+polar_labels = []
 for i, step_name in enumerate(sorted(data_by_step)):
-    pie_data.append(data_by_step[step_name]['cumulative_time'])
+    step_data = data_by_step[step_name]
+
+    # save the cumulative time for the pie chart
+    pie_data.append(step_data['cumulative_time'])
     pie_colors.append(colors[(i % len(colors))])
     pie_labels.append(" {}".format(str(step_name)))
+
+    # save the average time for the polar chart
+    polar_data.append("%.2f" % (step_data['cumulative_time'] / step_data['occurs']))
+    polar_colors.append(colors[(i % len(colors))])
+    polar_labels.append(" {}".format(str(step_name)))
 
 # GRAPH 2: BAR GRAPH WITH STACKED PROCESS STEP MINUTES PER DATE
 stacked_ds = []
@@ -307,4 +319,5 @@ template = j2_env.get_template(input_html_j2)
 with open(output_html_file, "wb") as fh:
     fh.write(template.render(metadata=metadata,
                              pie_labels=pie_labels, pie_data=pie_data, pie_colors=pie_colors,
-                             stacked_labels=date_labels, stacked_ds=stacked_ds))
+                             stacked_labels=date_labels, stacked_ds=stacked_ds,
+                             polar_data=polar_data, polar_colors=polar_colors, polar_labels=polar_labels))
