@@ -38,10 +38,12 @@ for the parser to operate correctly. The runbook columns should be, in left to r
 for a deployment or activity to take place.
 * Task: Numerical/sequence for identification of specific task.
 * Step: Command or item to execute.
+* Estimated Start Date: Date of the estimated kickoff for the activity.
 * Estimated Start Time: When the step is estimated to be kicked off.
 * Estimated Stop Time: When the step is estimated to complete.
 * Assignee: Person assigned to execute the task.
 * Status: String-based indicator of state of the task (complete, in progress, etc.).
+* Actual Start Date: Actual date of the kickoff of the activity.
 * Actual Start Time: Actual start time of executing the step.
 * Actual Stop Time: Actual stop time when the step completed.
 * Notes: Aggregate notes, errors, and other useful information to inform the next iteration of
@@ -49,7 +51,7 @@ the step in the playbook. Note that this MUST be contained to a single cell in t
 
 Additionally, there are some requirements in order for the playbook to work with the parser:
 
-* Playbook must have (minimum) 2 tabs named "Summary" and "Playbook" respectively.
+* Playbook must have (minimum) 3 tabs named "Summary", "Playbook", and "Meta" respectively.
 * Playbook must follow the same format/fields as exist in the sample playbook in the `examples`
 directory.
 
