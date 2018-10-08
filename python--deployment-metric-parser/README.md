@@ -82,8 +82,5 @@ steps or focusing on reducing the ovarall variation in the execution process.
 
 This parser is a quick first-cut and can be expanded but has limitations:
 
-* Cannot handle complicated playbook workbooks that have multiple worksheets within - as of right now,
-this parser expects the workbook to only have a single worksheet which it parses the data from, or that
-the worksheet with the playbook is always the *first* worksheet in a sequence of multiples.
-* Does not yet do aggregation across playbooks (you will end up with separate metric objects per
-playbook, which may/may not be useful to you).
+* Code probably needs a full rewrite at some point - right now, there is a TON of non-DRY code and
+inefficient ways to parse the data. This code can easily be cleaned up/reduced in total line count.
