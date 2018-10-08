@@ -34,19 +34,21 @@ class ColNames(Enum):
     procstep = 0
     task = 1
     step = 2
-    est_start = 3
-    est_end = 4
-    assignee = 5
-    status = 6
-    act_start = 7
-    act_end = 8
-    act_minutes = 9
-    errors = 10
-    notes = 11
+    est_start_date = 3
+    est_start = 4
+    est_end = 5
+    assignee = 6
+    status = 7
+    act_start_date = 8
+    act_start = 9
+    act_end = 10
+    act_minutes = 11
+    errors = 12
+    notes = 13
 
 # store the expected columns in the Excel document
-EXPECTED_COLS = [ "process step", "task", "step", "estimated start time", "estimated end time", "assignee",
-                  "status", "actual start time", "actual end time", "actual duration (minutes)", "errors", "additional notes" ]
+EXPECTED_COLS = [ "process step", "task", "step", "estimated start date", "estimated start time", "estimated end time", "assignee",
+                  "status", "actual start date", "actual start time", "actual end time", "actual duration (minutes)", "errors", "additional notes" ]
 
 # array for storing the metrics about each deployment
 pb = []
@@ -194,10 +196,13 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
     # store metrics for current deployment
     pb.append(current_pb)
 
+# before we do a data presentation, let's sort our deployments
+pb = sorted(pb, key=lambda k: k['started'])
+
 ##################
 # OUTPUT RESULTS #
 ##################
-for deploy in sorted(pb, key=lambda k: k['started']):
+for deploy in pb:
     print("---------------------------------------------------")
     print("CUSTOMER:      {0:<s}".format(deploy['customer']))
     print("ENVIRONMENT:   {0:<s}".format(deploy['env']))
@@ -213,7 +218,58 @@ for deploy in sorted(pb, key=lambda k: k['started']):
 ######################
 # OUTPUT HTML GRAPHS #
 ######################
+# create colors for random use
+colors = [ 'rgb(255, 99, 132)',
+           'rgb(255, 159, 64)',
+           'rgb(255, 205, 86)',
+           'rgb(75, 192, 192)',
+           'rgb(54, 162, 235)',
+           'rgb(153, 102, 255)',
+           'rgb(201, 203, 207)' ]
+
+# create labels for the last 30 days of calendar
+date_labels = [(datetime.today() + timedelta(days=-x)).strftime("%m/%d/%y") for x in range(30, 0, -1)]
+
+# parse each step into an object for both date-focused as well as step-focused
+data_by_date = {}
+data_by_step = {}
+for d in pb:
+    # add a date dict to store metrics if not already there
+    if d['started'] not in data_by_date:
+        data_by_date[d['started']] = {}
+
+    d_date_data = data_by_date[d['started']]
+
+    # add the process map step metrics to the date
+    for step in d['steps']:
+        cumulative_time = d['steps'][step]['cum_time']
+        occurs = d['steps'][step]['occurs']
+
+        # first, add the metrics to the data for the particular date
+        if step not in d_date_data:
+            d_date_data[step] = {'cumulative_time': 0, 'occurs': 0}
+
+        d_date_data[step]['cumulative_time'] += cumulative_time
+        d_date_data[step]['occurs'] += occurs
+
+        # next, add the metrics to the data for the particular step
+        if step not in data_by_step:
+            data_by_step[step] = {'cumulative_time': 0, 'occurs': 0}
+
+        data_by_step[step]['cumulative_time'] += cumulative_time
+        data_by_step[step]['occurs'] += occurs
+
+# GRAPH 1: PIE CHART WITH BREAKDOWN OF PER-PROCESS-STEP TOTAL MINUTES
+pie_data = []
+pie_colors = []
+pie_labels = []
+for i, step_name in enumerate(sorted(data_by_step)):
+    pie_data.append(data_by_step[step_name]['cumulative_time'])
+    pie_colors.append(colors[(i % len(colors))])
+    pie_labels.append(" {}".format(str(step_name)))
+
+# output HTML with data
 j2_env = Environment(loader=FileSystemLoader("templates"), trim_blocks=True)
 template = j2_env.get_template(input_html_j2)
 with open(output_html_file, "wb") as fh:
-    fh.write(template.render(deployments=pb))
+    fh.write(template.render(pie_labels=pie_labels, pie_data=pie_data, pie_colors=pie_colors))

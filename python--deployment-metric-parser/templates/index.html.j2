@@ -2,6 +2,87 @@
   <head>
   </head>
   <body>
-    {{ deployments }}
+    <canvas id="process-step-by-date" style="display: block; max-height: 500px; max-width: 500px;"></canvas>
+    <canvas id="process-pie" style="display: block; max-height: 500px; max-width: 500px;"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+
+
+    <!-- "process-pie" pie-chart of consumption percent by process step -->
+    <script>
+        var ctx = document.getElementById("process-pie").getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: {{ pie_labels }},
+                datasets: [{
+                    data: {{ pie_data }},
+                    backgroundColor: {{ pie_colors }}
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Total time (minutes) Per Process Step',
+                    fontSize: 22
+                },
+                legend: {
+                    display: true,
+                    position: 'right',
+                    labels: {
+                      fontSize: 16
+                    }
+                },
+                responsive: true
+            }
+        });
+    </script>
+
+    <!-- handles the "process-step-by-date" graph of process consumption per day -->
+    <script>
+        window.chartColors = {
+            red: 'rgb(255, 99, 132)',
+            orange: 'rgb(255, 159, 64)',
+            yellow: 'rgb(255, 205, 86)',
+            green: 'rgb(75, 192, 192)',
+            blue: 'rgb(54, 162, 235)',
+            purple: 'rgb(153, 102, 255)',
+            grey: 'rgb(201, 203, 207)'
+        };
+
+        var ctx = document.getElementById("process-step-by-date").getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ labels }},
+                datasets: [{
+                    label: 'Step A',
+                    backgroundColor: window.chartColors.red,
+                    borderColor: window.chartColors.red,
+                    data: [12, 19, 3, 5, 2, 3],
+                    fill: 'false',
+                }, {
+                    label: 'Step B',
+                    backgroundColor: window.chartColors.blue,
+                    borderColor: window.chartColors.blue,
+                    data: [22, 12, 13, 31, 13, 10],
+                    fill: false,
+                }]
+            },
+            options: {
+                elements: {
+                    line: {
+                        tension: 0.000001
+                    }
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
   </body>
 </html>
