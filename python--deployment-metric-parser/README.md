@@ -84,6 +84,14 @@ If all goes well, you should see various metrics that are output to the screen c
 be useful information to inform where you should focus your efforts in further automating the manual
 steps or focusing on reducing the ovarall variation in the execution process.
 
+## Output Examples
+
+Below are some screenshots of what you can expect to see when you open the `index.html` file generated
+by the script in your browser:
+
+![Graphs 1](img/graphs_1.png "Graphs 1")
+![Graphs 2](img/graphs_2.png "Graphs 2")
+
 ## Limitations
 
 This parser is a quick first-cut and can be expanded but has limitations:
