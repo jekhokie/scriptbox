@@ -265,6 +265,13 @@ for d in pb:
         data_by_step[step]['cumulative_time'] += cumulative_time
         data_by_step[step]['occurs'] += occurs
 
+# METADATA: PROVIDE SOME BASIC METADATA ABOUT THE GRAPH DATA
+metadata = {
+             'total_days': config['graph_days'],
+             'total_minutes': sum(data_by_step[d]['cumulative_time'] for d in data_by_step),
+             'total_deploys': len(pb)
+           }
+
 # GRAPH 1: PIE CHART WITH BREAKDOWN OF PER-PROCESS-STEP TOTAL MINUTES
 pie_data = []
 pie_colors = []
@@ -298,5 +305,6 @@ for d in date_labels:
 j2_env = Environment(loader=FileSystemLoader("templates"), trim_blocks=True)
 template = j2_env.get_template(input_html_j2)
 with open(output_html_file, "wb") as fh:
-    fh.write(template.render(pie_labels=pie_labels, pie_data=pie_data, pie_colors=pie_colors,
+    fh.write(template.render(metadata=metadata,
+                             pie_labels=pie_labels, pie_data=pie_data, pie_colors=pie_colors,
                              stacked_labels=date_labels, stacked_ds=stacked_ds))

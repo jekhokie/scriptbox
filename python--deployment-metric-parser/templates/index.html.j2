@@ -2,7 +2,21 @@
   <head>
   </head>
   <body>
-    <canvas id="process-pie" style="display: block; max-height: 500px; max-width: 500px;"></canvas>
+    <canvas id="process-pie" style="display: inline-block; max-height: 500px; max-width: 500px;"></canvas>
+    <table style="display: inline-block; vertical-align: top; margin-left: 200px; font-size: 32px; border: 1px solid black; margin-top: 200px; padding: 12px;">
+        <tr>
+            <td>Total Deployments:&nbsp;&nbsp;</td>
+            <td>{{metadata['total_deploys']}}</td>
+        </tr>
+        <tr>
+            <td>Total Minutes:</td>
+            <td>{{metadata['total_minutes']}}</td>
+        </tr>
+        <tr>
+            <td>Total Days:</td>
+            <td>{{metadata['total_days']}}</td>
+        </tr>
+    </table>
     <canvas id="process-step-by-date" style="display: block; max-height: 1000px; max-width: 1500px;"></canvas>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
 
