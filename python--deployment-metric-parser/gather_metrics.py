@@ -3,12 +3,27 @@
 # Purpose: Parse Excel documents in the tests directory and produce
 #          useful metrics for inspection.
 #
+# TODO: There are a lot of areas of improvement - specifically:
+#    - Validate summary worksheet exists, named "Summary", with required fields/values
+#    - Validate playbook worksheet exists, named "Playbook", with required columns
+#    - Validate task States worksheet exists (drop-downs for "Status" fields)
+#    - De-normalize playbook metrics - currently duplication for easily pulling data out/sorting
 
 import glob
 import os
 import xlrd
+import yaml
 from datetime import datetime, timedelta
 from enum import Enum
+from jinja2 import Environment, FileSystemLoader
+
+# load configuration settings
+with open('config/settings.yml', 'r') as yml:
+  config = yaml.load(yml)
+
+# name of the HTML file to output when rendering graphs
+input_html_j2 = "index.html.j2"
+output_html_file = "html_output/index.html"
 
 # classify each of the possible Excel Cell types
 class ExcelCellType(Enum):
@@ -24,17 +39,24 @@ class ColNames(Enum):
     procstep = 0
     task = 1
     step = 2
-    est_start = 3
-    est_end = 4
-    assignee = 5
-    status = 6
-    act_start = 7
-    act_end = 8
-    notes = 9
+    est_start_date = 3
+    est_start = 4
+    est_end = 5
+    assignee = 6
+    status = 7
+    act_start_date = 8
+    act_start = 9
+    act_end = 10
+    act_minutes = 11
+    errors = 12
+    notes = 13
 
 # store the expected columns in the Excel document
-EXPECTED_COLS = ["process step", "task", "step", "estimated start time", "estimated end time", "assignee",
-                 "status", "actual start time", "actual end time", "notes" ]
+EXPECTED_COLS = [ "process step", "task", "step", "estimated start date", "estimated start time", "estimated end time", "assignee",
+                  "status", "actual start date", "actual start time", "actual end time", "actual duration (minutes)", "errors", "additional notes" ]
+
+# array for storing the metrics about each deployment
+pb = []
 
 # validate that the playbook has the required columns and ordering required
 def validate_columns(sheet):
@@ -47,7 +69,7 @@ def validate_columns(sheet):
     # check each column name for validity/order
     i = 0
     for cell in cols:
-        if EXPECTED_COLS[i] != cell.value.lower():
+        if EXPECTED_COLS[i] != cell.value.lower().replace('\n', ' ').replace('\r', ' '):
             raise(Exception("Column '{}' in position {} does not match expected column '{}'".format(cell.value.lower(), i, EXPECTED_COLS[i])))
         i += 1
 
@@ -77,42 +99,29 @@ def excel_time_to_datetime(t):
     else:
         raise(Exception("Expecting {} to be either a text or date type - received {} type".format(t.value, t.ctype)))
 
-# convert a date cell to a datetime object
-def excel_date_to_datetime(d):
-    if d.ctype == ExcelCellType.date:
-        print(d.value)
-        # convert respective components to hours and minutes (don't care about seconds
-        # as that is likely too granular to start - will just add percent error that will
-        # only be significant much later in the metric gathering)
-        seconds = round(t.value * 86400)
-        minutes, seconds = divmod(seconds, 60)
-        hours, minutes = divmod(minutes, 60)
-
-        return datetime.strptime("%d:%d" % (hours, minutes), "%H:%M")
-    else:
-        raise(Exception("Expecting {} to be either a text or date type - received {} type".format(t.value, t.ctype)))
-
 # parse all playbooks in directory - exclude tilde-starting files indicating
 # the file may be open for editing (not a valid use case)
 for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswith('~')]:
-    # TODO: Validation for format expectations:
-    #    - Summary worksheet exists, named "Summary", with required fields/values
-    #    - Playbook worksheet exists, named "Playbook", with required columns
-    #    - Task States worksheet exists (drop-downs for "Status" fields)
-
     # open the file and get the summary and playbook worksheets
     wb = xlrd.open_workbook(file)
     summary = wb.sheet_by_name("Summary")
-    pb = {'customer': summary.cell(0, 1).value, 'date': summary.cell(1, 1).value, 'steps': {}}
     sheet = wb.sheet_by_name("Playbook")
 
-    # get metadata about the deployment
-    pb['customer'] = summary.cell(0, 1).value
-    pb['environment'] = summary.cell(1, 1).value
+    # pull metadata out of the worksheets
+    customer = summary.cell(0, 1).value
+    cust_env = summary.cell(1, 1).value
     start_date = datetime(*xlrd.xldate_as_tuple(summary.cell(2, 1).value, wb.datemode))
-    pb['date'] = start_date.strftime("%m/%d/%y")
-    pb['installer'] = summary.cell(5, 1).value
-    pb['lead'] = summary.cell(6, 1).value
+    started = start_date.strftime("%m/%d/%y")
+    installer_version = summary.cell(4, 1).value
+    lead_installer = summary.cell(5, 1).value
+
+    # create a deployment object for metric storage
+    current_pb = { 'customer': customer,
+                   'env': cust_env,
+                   'installer': installer_version,
+                   'lead': lead_installer,
+                   'started': started,
+                   'steps': { } }
 
     # parse each step in the playbook
     for i in range(0, sheet.nrows):
@@ -128,37 +137,49 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
             try:
                 # get process step and initialize metrics
                 pmap = actual_vals[ColNames.procstep]
-                if pmap.ctype == ExcelCellType.blank or pmap.ctype == ExcelCellType.empty:
+                if pmap.ctype in {ExcelCellType.blank, ExcelCellType.empty}:
                     # if there is no process map step specified, skip this row
                     continue
                 else:
                     pmap = pmap.value.lower()
-                    if pmap not in pb['steps']:
-                        pb['steps'][pmap] = {'occurs': 1, 'cum_time': 0, 'min_time': None, 'min_step_number': '',
-                                       'max_time': None, 'max_step_number': '', 'avg_time': 0, 'notes': ''}
+                    if pmap not in current_pb['steps']:
+                        current_pb['steps'][pmap] = {'occurs': 1, 'cum_time': 0, 'min_time': None, 'min_step_number': '',
+                                                     'max_time': None, 'max_step_number': '', 'avg_time': 0, 'errors': '', 'notes': ''}
                     else:
-                        pb['steps'][pmap]['occurs'] += 1
+                        current_pb['steps'][pmap]['occurs'] += 1
 
-                # get actual start and end times
-                t_start = excel_time_to_datetime(actual_vals[ColNames.act_start])
-                t_end = excel_time_to_datetime(actual_vals[ColNames.act_end])
+                # get actual start and end times OR duration
+                start_time = actual_vals[ColNames.act_start]
+                end_time = actual_vals[ColNames.act_end]
+                actual_minutes = actual_vals[ColNames.act_minutes]
 
-                # handle when day rolls over to next day
-                if t_end < t_start:
-                    t_end += timedelta(days=1)
+                # determine whether to use minutes or timeframes
+                t_delta = 0
+                if start_time.ctype in {ExcelCellType.blank, ExcelCellType.empty} or end_time.ctype in {ExcelCellType.blank, ExcelCellType.empty}:
+                    if actual_minutes.ctype in {ExcelCellType.blank, ExcelCellType.empty}:
+                        raise(Exception("No start/end time or duration (minutes)"))
+                    else:
+                        t_delta = actual_minutes.value
+                else:
+                    t_start = excel_time_to_datetime(actual_vals[ColNames.act_start])
+                    t_end = excel_time_to_datetime(actual_vals[ColNames.act_end])
 
-                # calculate time delta for step
-                t_delta = (t_end - t_start).total_seconds() / 60.0
+                    # handle when day rolls over to next day
+                    if t_end < t_start:
+                        t_end += timedelta(days=1)
+
+                    # calculate time delta for step
+                    t_delta = (t_end - t_start).total_seconds() / 60.0
 
                 # easier variables
-                step = pb['steps'][pmap]
+                step = current_pb['steps'][pmap]
                 task_number = actual_vals[ColNames.task].value
 
-                # add cumulative time and notes
+                # add cumulative time, errors, and notes
                 step['cum_time'] += t_delta
-                ct = actual_vals[ColNames.notes].ctype
-                if ct != ExcelCellType.empty and ct != ExcelCellType.blank:
-                    step['notes'] += ">" + actual_vals[ColNames.notes].value
+                ct = actual_vals[ColNames.errors].ctype
+                if ct not in {ExcelCellType.empty, ExcelCellType.blank}:
+                    step['errors'] += ">" + actual_vals[ColNames.errors].value
 
                 # if time delta is greater than last known delta, specify this as longest
                 if t_delta > step['max_time'] or step['max_time'] is None:
@@ -172,23 +193,110 @@ for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswi
 
                 # update the average duration
                 step['avg_time'] = step['cum_time'] / step['occurs']
-
-                # calculate actual duration for step
-                print("[{}] -- {} - {} -- [{}]".format(pmap, t_start.strftime("%I:%M %p"), t_end.strftime("%I:%M %p"), t_delta))
             except Exception, e:
                 raise(Exception("Error on row {}: {}".format(i+1, e)))
         except Exception, e:
             raise(Exception("ERROR: {} has error: {}".format(file, e.message)))
 
-    # output the final metrics
+    # store metrics for current deployment
+    pb.append(current_pb)
+
+# before we do a data presentation, let's sort our deployments
+pb = sorted(pb, key=lambda k: k['started'])
+
+##################
+# OUTPUT RESULTS #
+##################
+for deploy in pb:
     print("---------------------------------------------------")
-    print("CUSTOMER:    {0:<s}".format(pb['customer']))
-    print("ENVIRONMENT: {0:<s}".format(pb['environment']))
-    print("DATE:        {0:<s}".format(pb['date']))
-    print("INSTALLER:   {0:<s}".format(pb['installer']))
-    print("LEAD:        {0:<s}".format(pb['lead']))
+    print("CUSTOMER:      {0:<s}".format(deploy['customer']))
+    print("ENVIRONMENT:   {0:<s}".format(deploy['env']))
+    print("DATE:          {0:<s}".format(deploy['started']))
+    print("INSTALLER VER: {0:<s}".format(deploy['installer']))
+    print("LEAD:          {0:<s}".format(deploy['lead']))
     print("TIMINGS (IN MINUTES):")
-    for key in sorted(pb['steps']):
-        p = pb['steps'][key]
+    for key in sorted(deploy['steps']):
+        p = deploy['steps'][key]
         print("  - {0:s} | CUM: {1:>4.0f} | AVG: {2:>4.0f} | MIN: {2:>4.0f} | MAX: {3:>4.0f}".format(key, p['cum_time'], p['avg_time'], p['min_time'], p['max_time']))
     print("---------------------------------------------------")
+
+######################
+# OUTPUT HTML GRAPHS #
+######################
+# create colors for random use
+colors = [ 'rgb(255, 99, 132)',
+           'rgb(255, 159, 64)',
+           'rgb(255, 205, 86)',
+           'rgb(75, 192, 192)',
+           'rgb(54, 162, 235)',
+           'rgb(153, 102, 255)',
+           'rgb(201, 203, 207)' ]
+
+# create labels for the last 30 days of calendar from end date
+end_date = datetime.strptime(config['end_date'], "%m/%d/%y")
+date_labels = [(end_date + timedelta(days=-x)).strftime("%m/%d/%y") for x in range(config['graph_days'], 0, -1)]
+
+# parse each step into an object for both date-focused as well as step-focused
+data_by_date = {}
+data_by_step = {}
+for d in pb:
+    # add a date dict to store metrics if not already there
+    if d['started'] not in data_by_date:
+        data_by_date[d['started']] = {}
+
+    d_date_data = data_by_date[d['started']]
+
+    # add the process map step metrics to the date
+    for step in d['steps']:
+        cumulative_time = d['steps'][step]['cum_time']
+        occurs = d['steps'][step]['occurs']
+
+        # first, add the metrics to the data for the particular date
+        if step not in d_date_data:
+            d_date_data[step] = {'cumulative_time': 0, 'occurs': 0}
+
+        d_date_data[step]['cumulative_time'] += cumulative_time
+        d_date_data[step]['occurs'] += occurs
+
+        # next, add the metrics to the data for the particular step
+        if step not in data_by_step:
+            data_by_step[step] = {'cumulative_time': 0, 'occurs': 0}
+
+        data_by_step[step]['cumulative_time'] += cumulative_time
+        data_by_step[step]['occurs'] += occurs
+
+# GRAPH 1: PIE CHART WITH BREAKDOWN OF PER-PROCESS-STEP TOTAL MINUTES
+pie_data = []
+pie_colors = []
+pie_labels = []
+for i, step_name in enumerate(sorted(data_by_step)):
+    pie_data.append(data_by_step[step_name]['cumulative_time'])
+    pie_colors.append(colors[(i % len(colors))])
+    pie_labels.append(" {}".format(str(step_name)))
+
+# GRAPH 2: BAR GRAPH WITH STACKED PROCESS STEP MINUTES PER DATE
+stacked_ds = []
+for i, step in enumerate(sorted(data_by_step.keys())):
+    stacked_ds.append({
+                        'label': str(step),
+                        'backgroundColor': colors[(i % len(colors))],
+                        'data': []
+                      })
+
+for d in date_labels:
+    if d in data_by_date:
+        for s in stacked_ds:
+            if s['label'] in data_by_date[d]:
+                s['data'].append(data_by_date[d][s['label']]['cumulative_time'])
+            else:
+                s['data'].append(0)
+    else:
+        for s in stacked_ds:
+            s['data'].append(0)
+
+# output HTML with data
+j2_env = Environment(loader=FileSystemLoader("templates"), trim_blocks=True)
+template = j2_env.get_template(input_html_j2)
+with open(output_html_file, "wb") as fh:
+    fh.write(template.render(pie_labels=pie_labels, pie_data=pie_data, pie_colors=pie_colors,
+                             stacked_labels=date_labels, stacked_ds=stacked_ds))

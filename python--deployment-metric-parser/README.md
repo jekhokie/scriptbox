@@ -57,15 +57,21 @@ directory.
 column) specified - this is a way to protect any extraneous rows and such that are not part of the
 actual execution.
 
-Take and make a copy of the playbook in the `examples` directory and copy it into the `tests`
+Take and make a copy of the playbooks in the `examples` directory and copy them into the `tests`
 directory:
 
 ```bash
 $ cp examples/Playbook_1_Sample.xlsx tests/Playbook1.xlsx
+$ cp examples/Playbook_2_Sample.xlsx tests/Playbook2.xlsx
+$ cp examples/Playbook_3_Sample.xlsx tests/Playbook3.xlsx
 ```
 
-The utility can be run without any changes to the sample playbook, but you are free to edit it and
-make as many copies/variations of the playbook as you wish. Once you have a copy of it in the
+**NOTE** If you wish to adjust the dates for the graphs, please edit the `config/settings.yml` file
+prior to proceeding. Otherwise, if you're just using the sample playbooks out of the box, the settings
+in the `settings.yml` file should suffice.
+
+The utility can be run without any changes to the sample playbooks, but you are free to edit it and
+make as many copies/variations of the playbooks as you wish. Once you have a copy of them in the
 `tests` directory, go ahead and run the utility:
 
 ```bash
@@ -80,8 +86,5 @@ steps or focusing on reducing the ovarall variation in the execution process.
 
 This parser is a quick first-cut and can be expanded but has limitations:
 
-* Cannot handle complicated playbook workbooks that have multiple worksheets within - as of right now,
-this parser expects the workbook to only have a single worksheet which it parses the data from, or that
-the worksheet with the playbook is always the *first* worksheet in a sequence of multiples.
-* Does not yet do aggregation across playbooks (you will end up with separate metric objects per
-playbook, which may/may not be useful to you).
+* Code probably needs a full rewrite at some point - right now, there is a TON of non-DRY code and
+inefficient ways to parse the data. This code can easily be cleaned up/reduced in total line count.
