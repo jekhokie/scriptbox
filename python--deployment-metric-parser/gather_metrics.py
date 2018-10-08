@@ -274,8 +274,29 @@ for i, step_name in enumerate(sorted(data_by_step)):
     pie_colors.append(colors[(i % len(colors))])
     pie_labels.append(" {}".format(str(step_name)))
 
+# GRAPH 2: BAR GRAPH WITH STACKED PROCESS STEP MINUTES PER DATE
+stacked_ds = []
+for i, step in enumerate(sorted(data_by_step.keys())):
+    stacked_ds.append({
+                        'label': str(step),
+                        'backgroundColor': colors[(i % len(colors))],
+                        'data': []
+                      })
+
+for d in date_labels:
+    if d in data_by_date:
+        for s in stacked_ds:
+            if s['label'] in data_by_date[d]:
+                s['data'].append(data_by_date[d][s['label']]['cumulative_time'])
+            else:
+                s['data'].append(0)
+    else:
+        for s in stacked_ds:
+            s['data'].append(0)
+
 # output HTML with data
 j2_env = Environment(loader=FileSystemLoader("templates"), trim_blocks=True)
 template = j2_env.get_template(input_html_j2)
 with open(output_html_file, "wb") as fh:
-    fh.write(template.render(pie_labels=pie_labels, pie_data=pie_data, pie_colors=pie_colors))
+    fh.write(template.render(pie_labels=pie_labels, pie_data=pie_data, pie_colors=pie_colors,
+                             stacked_labels=date_labels, stacked_ds=stacked_ds))
