@@ -1,5 +1,5 @@
 # ending date for graphs
-end_date: 2/1/18
+end_date: 10/19/18
 
 # total days to represent in graphs (ending on end_date)
-graph_days: 30
+graph_days: 45

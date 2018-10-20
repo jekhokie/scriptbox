@@ -242,9 +242,12 @@ data_by_step = {}
 for d in pb:
     # add a date dict to store metrics if not already there
     if d['started'] not in data_by_date:
-        data_by_date[d['started']] = {}
+        data_by_date[d['started']] = {'process_steps': {}, 'deployments': 0}
 
+    # record an increase in the number of deployments for this date
     d_date_data = data_by_date[d['started']]
+    d_date_data['deployments'] += 1
+    d_date_data = d_date_data['process_steps']
 
     # add the process map step metrics to the date
     for step in d['steps']:
@@ -295,20 +298,39 @@ for i, step_name in enumerate(sorted(data_by_step)):
 
 # GRAPH 2: BAR GRAPH WITH STACKED PROCESS STEP MINUTES PER DATE
 stacked_ds = []
+
+# add the number of deployments line data
+num_deployments = {
+                    'label': '# Deployments',
+                    'fill': 'false',
+                    'backgroundColor': '#006600',
+                    'borderColor': '#006600',
+                    'borderDash': [5, 5],
+                    'type': 'line',
+                    'yAxisID': 'yAxisRight',
+                    'data': []
+                  }
+stacked_ds.append(num_deployments)
+
+# add the respective process steps
 for i, step in enumerate(sorted(data_by_step.keys())):
     stacked_ds.append({
                         'label': str(step),
                         'backgroundColor': colors[(i % len(colors))],
+                        'yAxisID': 'yAxisLeft',
                         'data': []
                       })
 
 for d in date_labels:
     if d in data_by_date:
         for s in stacked_ds:
-            if s['label'] in data_by_date[d]:
-                s['data'].append(data_by_date[d][s['label']]['cumulative_time'])
-            else:
+            if s['label'] in data_by_date[d]['process_steps']:
+                s['data'].append(data_by_date[d]['process_steps'][s['label']]['cumulative_time'])
+            elif s['label'] != '# Deployments':
                 s['data'].append(0)
+
+        num_deployments['data'].append(data_by_date[d]['deployments'])
+
     else:
         for s in stacked_ds:
             s['data'].append(0)

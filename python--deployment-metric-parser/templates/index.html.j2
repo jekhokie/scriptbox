@@ -2,24 +2,16 @@
   <head>
   </head>
   <body>
-    <canvas id="process-pie" style="display: inline-block; max-height: 500px; max-width: 500px;"></canvas>
-    <canvas id="process-polar" style="display: inline-block; max-height: 500px; max-width: 500px;"></canvas>
-    <table style="display: inline-block; vertical-align: top; margin-left: 100px; font-size: 32px; border: 1px solid black; margin-top: 100px; padding: 12px;">
-        <tr>
-            <td>Total Deployments:&nbsp;&nbsp;</td>
-            <td>{{metadata['total_deploys']}}</td>
-        </tr>
-        <tr>
-            <td>Total Minutes:</td>
-            <td>{{metadata['total_minutes']}}</td>
-        </tr>
-        <tr>
-            <td>Total Days:</td>
-            <td>{{metadata['total_days']}}</td>
-        </tr>
-    </table>
-    <canvas id="process-step-by-date" style="display: block; max-height: 1000px; max-width: 1500px;"></canvas>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <div>
+        <span><b>Total Deployments:</b>&nbsp;{{metadata['total_deploys']}}</span>
+        <span><b>Total Minutes:</b>&nbsp;{{metadata['total_minutes']}}</span>
+        <span><b>Total Days:</b>&nbsp;{{metadata['total_days']}}</span>
+    </div>
+    <canvas id="process-pie" style="display: inline-block; max-height: 700px; max-width: 49%;"></canvas>
+    <canvas id="process-polar" style="display: inline-block; max-height: 700px; max-width: 49%;"></canvas>
+    <canvas id="process-step-by-date" style="display: block; max-height: 1000px; max-width: 1500px; margin-top: 30px;"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
     <!-- "process-pie" pie-chart of consumption percent by process step -->
     <script>
@@ -37,7 +29,9 @@
                 title: {
                     display: true,
                     text: 'Total Time (Minutes) Per Process Step',
-                    fontSize: 22
+                    fontColor: 'black',
+                    fontSize: 22,
+                    padding: 30
                 },
                 legend: {
                     display: true,
@@ -46,7 +40,28 @@
                       fontSize: 16
                     }
                 },
-                responsive: true
+                responsive: true,
+                plugins: {
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'end',
+                        backgroundColor: function(context) {
+                            return context.dataset.backgroundColor;
+                        },
+                        borderColor: 'white',
+                        borderRadius: 25,
+                        borderWidth: 2,
+                        color: 'black',
+                        display: function(context) {
+                            var percent = Math.round(context.dataset.data[context.dataIndex] / {{metadata['total_minutes']}} * 100);
+                            return percent > 10;
+                        },
+                        formatter: function(value, context) {
+                            var value = context.dataset.data[context.dataIndex];
+                            return context.chart.data.labels[context.dataIndex] + ": " + value + " (" + Math.round(value / {{metadata['total_minutes']}} * 100) + "%)";
+                        }
+                    }
+                }
             }
         });
     </script>
@@ -66,7 +81,9 @@
                 title: {
                     display: true,
                     text: 'Average Time (Minutes) Per Process Step',
-                    fontSize: 22
+                    fontColor: 'black',
+                    fontSize: 22,
+                    padding: 30
                 },
                 legend: {
                     display: true,
@@ -75,7 +92,12 @@
                       fontSize: 16
                     }
                 },
-                responsive: true
+                responsive: true,
+                plugins: {
+                    datalabels: {
+                        display: false
+                    }
+                }
             }
         });
     </script>
@@ -92,7 +114,8 @@
             options: {
                 title: {
                     display: true,
-                    text: 'Total Time (Minutes) Per Step Per Date',
+                    text: '# Deployments and Total Time (Minutes) Per Step Per Date',
+                    fontColor: 'black',
                     fontSize: 22
                 },
                 tooltips: {
@@ -115,8 +138,33 @@
                         stacked: true
                     }],
                     yAxes: [{
-                        stacked: true
+                        display: true,
+                        position: "left",
+                        type: "linear",
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Minutes',
+                            beginAtZero: true
+                        },
+                        stacked: true,
+                        id: "yAxisLeft"
+                    },
+                    {
+                        display: true,
+                        position: "right",
+                        type: "linear",
+                        scaleLabel: {
+                            display: true,
+                            labelString: '# Deploys',
+                            beginAtZero: true
+                        },
+                        id: "yAxisRight"
                     }]
+                },
+                plugins: {
+                    datalabels: {
+                        display: false
+                    }
                 }
             }
         });
