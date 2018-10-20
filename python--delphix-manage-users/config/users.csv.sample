@@ -1,0 +1,7 @@
+username,first_name,last_name,email_address,principal_credential,password,admin_priv,js_user
+# user with Jetstream access only
+jschmoe,Joe,Schmoe,jschmoe@some-email.com,jschmoe,test123,N,Y
+# user with Jetstream and Admin access
+rjones,Randy,Jones,rjones@some-email.com,rjones,test123,Y,Y
+# user with Admin access only
+stemple,Shirley,Temple,stemple@some-email.com,stemple,test123,Y,N
