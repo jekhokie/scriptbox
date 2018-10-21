@@ -41,10 +41,15 @@
                     }
                 },
                 responsive: true,
+                layout: {
+                    padding: {
+                        bottom: 40
+                    }
+                },
                 plugins: {
                     datalabels: {
                         anchor: 'end',
-                        align: 'end',
+                        align: 'center',
                         backgroundColor: function(context) {
                             return context.dataset.backgroundColor;
                         },
@@ -93,6 +98,11 @@
                     }
                 },
                 responsive: true,
+                layout: {
+                    padding: {
+                        bottom: 40
+                    }
+                },
                 plugins: {
                     datalabels: {
                         display: false
