@@ -89,8 +89,7 @@ steps or focusing on reducing the ovarall variation in the execution process.
 Below are some screenshots of what you can expect to see when you open the `index.html` file generated
 by the script in your browser:
 
-![Graphs 1](img/graphs_1.png "Graphs 1")
-![Graphs 2](img/graphs_2.png "Graphs 2")
+![Graphs](img/graphs.png "Graphs")
 
 ## Limitations
 
