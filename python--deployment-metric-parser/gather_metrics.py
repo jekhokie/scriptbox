@@ -212,7 +212,7 @@ for deploy in pb:
     print("CUSTOMER:      {0:<s}".format(deploy['customer']))
     print("ENVIRONMENT:   {0:<s}".format(deploy['env']))
     print("DATE:          {0:<s}".format(deploy['started']))
-    print("INSTALLER VER: {0:<s}".format(deploy['installer']))
+    print("INSTALLER VER: {0:<s}".format(str(deploy['installer'])))
     print("LEAD:          {0:<s}".format(deploy['lead']))
     print("TIMINGS (IN MINUTES):")
     for key in sorted(deploy['steps']):

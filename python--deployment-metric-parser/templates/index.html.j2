@@ -59,7 +59,7 @@
                         color: 'black',
                         display: function(context) {
                             var percent = Math.round(context.dataset.data[context.dataIndex] / {{metadata['total_minutes']}} * 100);
-                            return percent > 10;
+                            return percent > 6;
                         },
                         formatter: function(value, context) {
                             var value = context.dataset.data[context.dataIndex];
