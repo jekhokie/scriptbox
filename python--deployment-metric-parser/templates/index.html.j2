@@ -3,9 +3,24 @@
   </head>
   <body>
     <div>
-        <span><b>Total Deployments:</b>&nbsp;{{metadata['total_deploys']}}</span>
-        <span><b>Total Minutes:</b>&nbsp;{{metadata['total_minutes']}}</span>
-        <span><b>Total Days:</b>&nbsp;{{metadata['total_days']}}</span>
+        <table>
+            <tr>
+                <td><b>Total Deployments:</b></td>
+                <td>{{metadata['total_deploys']}}</td>
+            </tr>
+            <tr>
+                <td><b>Total Work Time (All Upgrades):</b></td>
+                <td>{{"{:,.2f}".format(metadata['total_minutes'])}} Minutes ({{"{:,.2f}".format(metadata['total_hours'])}} Hours)</td>
+            </tr>
+            <tr>
+                <td><b>Average Work Time Per Upgrade:</b></td>
+                <td>{{"{:,.2f}".format(metadata['average_minutes'])}} Minutes ({{"{:,.2f}".format(metadata['average_hours'])}} Hours)</td>
+            </tr>
+            <tr>
+                <td><b>Time Period:</b></td>
+                <td>{{metadata['total_days']}} Days</td>
+            </tr>
+        </table>
     </div>
     <canvas id="process-pie" style="display: inline-block; max-height: 700px; max-width: 49%;"></canvas>
     <canvas id="process-polar" style="display: inline-block; max-height: 700px; max-width: 49%;"></canvas>

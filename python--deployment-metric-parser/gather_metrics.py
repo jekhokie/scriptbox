@@ -269,9 +269,13 @@ for d in pb:
         data_by_step[step]['occurs'] += occurs
 
 # METADATA: PROVIDE SOME BASIC METADATA ABOUT THE GRAPH DATA
+total_minutes = sum(data_by_step[d]['cumulative_time'] for d in data_by_step)
 metadata = {
              'total_days': config['graph_days'],
-             'total_minutes': sum(data_by_step[d]['cumulative_time'] for d in data_by_step),
+             'total_minutes': total_minutes,
+             'total_hours': total_minutes / 60,
+             'average_minutes': total_minutes / len(pb),
+             'average_hours': total_minutes / 60 / len(pb),
              'total_deploys': len(pb)
            }
 
