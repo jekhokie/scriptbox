@@ -102,6 +102,9 @@ def excel_time_to_datetime(t):
 # parse all playbooks in directory - exclude tilde-starting files indicating
 # the file may be open for editing (not a valid use case)
 for file in [f for f in glob.glob("tests/*") if not os.path.basename(f).startswith('~')]:
+    # output for troubleshooting
+    print("Processing: {}".format(file))
+
     # open the file and get the summary and playbook worksheets
     wb = xlrd.open_workbook(file)
     summary = wb.sheet_by_name("Summary")
@@ -339,6 +342,33 @@ for d in date_labels:
         for s in stacked_ds:
             s['data'].append(0)
 
+# GRAPH 4: TREND OF DAILY TIME PER UPGRADE FOR TOP 5 PROCESS STEPS
+sorted_cum_time = sorted(data_by_step, key=lambda x: data_by_step[x]['cumulative_time'])
+line_chart = []
+for i in [-5, -4, -3, -2, -1]:
+    data = []
+    process_to_plot = sorted_cum_time[i]
+    data = {
+             'label': str(process_to_plot),
+             'fill': 'false',
+             'backgroundColor': colors[(i % len(colors))],
+             'borderColor': colors[(i % len(colors))],
+             'lineTension': 0,
+             'data': data
+           }
+
+    # find all occurrences of the process step to plot
+    for d in date_labels:
+        if d in data_by_date:
+            if process_to_plot in data_by_date[d]['process_steps']:
+                data['data'].append(data_by_date[d]['process_steps'][process_to_plot]['cumulative_time'] / data_by_date[d]['deployments'])
+            else:
+                data['data'].append('NaN')
+        else:
+            data['data'].append('NaN')
+
+    line_chart.append(data)
+
 # output HTML with data
 j2_env = Environment(loader=FileSystemLoader("templates"), trim_blocks=True)
 template = j2_env.get_template(input_html_j2)
@@ -346,4 +376,5 @@ with open(output_html_file, "wb") as fh:
     fh.write(template.render(metadata=metadata,
                              pie_labels=pie_labels, pie_data=pie_data, pie_colors=pie_colors,
                              stacked_labels=date_labels, stacked_ds=stacked_ds,
-                             polar_data=polar_data, polar_colors=polar_colors, polar_labels=polar_labels))
+                             polar_data=polar_data, polar_colors=polar_colors, polar_labels=polar_labels,
+                             line_chart=line_chart))
