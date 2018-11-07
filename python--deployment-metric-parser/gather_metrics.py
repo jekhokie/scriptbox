@@ -377,4 +377,4 @@ with open(output_html_file, "wb") as fh:
                              pie_labels=pie_labels, pie_data=pie_data, pie_colors=pie_colors,
                              stacked_labels=date_labels, stacked_ds=stacked_ds,
                              polar_data=polar_data, polar_colors=polar_colors, polar_labels=polar_labels,
-                             line_chart=line_chart))
+                             line_chart=line_chart, deploy=pb))

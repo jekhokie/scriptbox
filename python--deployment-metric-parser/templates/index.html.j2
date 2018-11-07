@@ -1,5 +1,6 @@
 <html>
   <head>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   </head>
   <body>
     <div>
@@ -26,6 +27,37 @@
     <canvas id="process-polar" style="display: inline-block; max-height: 700px; max-width: 49%;"></canvas>
     <canvas id="process-step-by-date" style="display: block; max-height: 1000px; max-width: 1500px; margin-top: 30px;"></canvas>
     <canvas id="top-process-steps" style="display: block; max-height: 1000px; max-width: 1500px; margin-top: 30px;"></canvas>
+
+    <div>
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Environment</th>
+                    <th>Operator</th>
+                    <th>Process Timings (Minutes)</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {%for d in deploy%}
+                    <tr>
+                        <td>{{d['started']}}</td>
+                        <td>{{d['customer']}}</td>
+                        <td>{{d['env']}}</td>
+                        <td>{{d['lead']}}</td>
+                        <td>
+                            {%for key in d['steps']|sort%}
+                                {{"{0:s} | CUM: {1:>4.0f} | AVG: {2:>4.0f} | MIN: {2:>4.0f} | MAX: {3:>4.0f}<br/>".format(key, d['steps'][key]['cum_time'], d['steps'][key]['avg_time'], d['steps'][key]['min_time'], d['steps'][key]['max_time'])}}
+                            {%endfor%}
+                        </td>
+                    </tr>
+                {%endfor%}
+            </tbody>
+        </table>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
