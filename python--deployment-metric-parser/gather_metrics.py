@@ -369,6 +369,9 @@ for i in [-5, -4, -3, -2, -1]:
 
     line_chart.append(data)
 
+# TODO: TABLE OF TOP 5 PROCESS STEPS AND ASSOCIATED PER-UPGRADE TIMINGS (AVG.) AND PERCENTAGES
+# THIS CAN BE EXPOSING THE PIE GRAPH OF TOP CONSUMERS IN A SORTED TABULAR FASHION FOR EXPLICIT DATA PRESENTATION
+
 # output HTML with data
 j2_env = Environment(loader=FileSystemLoader("templates"), trim_blocks=True)
 template = j2_env.get_template(input_html_j2)
