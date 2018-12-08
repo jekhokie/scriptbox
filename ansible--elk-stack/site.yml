@@ -1,0 +1,14 @@
+---
+- hosts: all
+  roles:
+    - common
+    - filebeat
+
+- hosts: elasticsearch
+  roles:
+    - elasticsearch
+
+- hosts: kibana
+  roles:
+    - kibana
+...

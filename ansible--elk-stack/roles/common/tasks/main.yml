@@ -1,0 +1,25 @@
+---
+- name: package dependencies
+  apt:
+    name: "{{ packages }}"
+    state: present
+  become: yes
+  vars:
+    packages:
+      - openjdk-8-jre-headless
+      - apt-transport-https
+      - curl
+
+- name: Elastic GPG Key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+  become: yes
+
+- name: Elastic repository
+  apt_repository:
+    repo: deb https://artifacts.elastic.co/packages/6.x/apt stable main
+    state: present
+    filename: elastic-6.x.list
+  become: yes
+...

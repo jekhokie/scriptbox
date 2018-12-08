@@ -1,0 +1,38 @@
+---
+- name: elasticsearch package
+  become: yes
+  apt:
+    name: elasticsearch
+    state: present
+
+- name: elasticsearch configuration file
+  become: yes
+  template:
+    src: elasticsearch.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+    owner: root
+    group: elasticsearch
+    mode: 0660
+  notify: restart elasticsearch
+
+- name: ingest-geoip plugin
+  become: yes
+  shell: echo y | /usr/share/elasticsearch/bin/elasticsearch-plugin install -s ingest-geoip
+  args:
+    creates: /usr/share/elasticsearch/plugins/ingest-geoip
+  notify: restart elasticsearch
+
+- name: ingest-user-agent plugin
+  become: yes
+  shell: echo y | /usr/share/elasticsearch/bin/elasticsearch-plugin install -s ingest-user-agent
+  args:
+    creates: /usr/share/elasticsearch/plugins/ingest-user-agent
+  notify: restart elasticsearch
+
+- name: elasticsearch service
+  become: yes
+  service:
+    name: elasticsearch
+    state: started
+    enabled: yes
+...

@@ -1,0 +1,12 @@
+#cluster.name: my-application
+node.name: {{ansible_hostname}}
+#node.attr.rack: r1
+path.data: /var/lib/elasticsearch
+path.logs: /var/log/elasticsearch
+#bootstrap.memory_lock: true
+network.host: [ {{ansible_host}}, _local_ ]
+#http.port: 9200
+discovery.zen.ping.unicast.hosts: ["{{ groups['elasticsearch'] | map('extract', hostvars, ['ansible_host']) | join('", "') }}"]
+#discovery.zen.minimum_master_nodes:
+#gateway.recover_after_nodes: 3
+#action.destructive_requires_name: true

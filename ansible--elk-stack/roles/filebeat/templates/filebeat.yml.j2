@@ -1,0 +1,48 @@
+filebeat.inputs:
+- type: log
+  enabled: false
+  paths:
+    - /var/log/*.log
+  #exclude_lines: ['^DBG']
+  #include_lines: ['^ERR', '^WARN']
+  #exclude_files: ['.gz$']
+  #fields:
+  #  level: debug
+  #  review: 1
+  #multiline.pattern: ^\[
+  #multiline.negate: false
+  #multiline.match: after
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+  #reload.period: 10s
+setup.template.settings:
+  index.number_of_shards: 3
+  #index.codec: best_compression
+  #_source.enabled: false
+#name:
+#tags: ["service-X", "web-tier"]
+#fields:
+#  env: staging
+#setup.dashboards.enabled: false
+#setup.dashboards.url:
+setup.kibana:
+  #host: "localhost:5601"
+  #space.id:
+output.elasticsearch:
+  hosts: ["{{ groups['elasticsearch'] | map('extract', hostvars, ['ansible_host']) | join(':9200", "') }}:9200"]
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
+#output.logstash:
+  #hosts: ["localhost:5044"]
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+  #ssl.key: "/etc/pki/client/cert.key"
+processors:
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~
+#logging.level: debug
+#logging.selectors: ["*"]
+#xpack.monitoring.enabled: false
+#xpack.monitoring.elasticsearch:

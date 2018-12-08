@@ -1,0 +1,34 @@
+---
+- name: filebeat package
+  become: yes
+  apt:
+    name: filebeat
+    state: present
+
+- name: filebeat configuration file
+  become: yes
+  template:
+    src: filebeat.yml.j2
+    dest: /etc/filebeat/filebeat.yml
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart filebeat
+
+- name: filebeat system logs configuration file
+  become: yes
+  copy:
+    src: system.yml
+    dest: /etc/filebeat/modules.d/system.yml
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart filebeat
+
+- name: filebeat service
+  become: yes
+  service:
+    name: filebeat
+    state: started
+    enabled: yes
+...
