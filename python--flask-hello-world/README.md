@@ -64,5 +64,18 @@ following parameters:
 - **Script Path**: python--flask-hello-world/jenkins/Jenkinsfile
 - **Lightweight checkout**: (checked)
 
+In addition, if you wish to have any new checkins into the project automatically trigger a build,
+you can specify the following:
+
+- **GitHub project**: (checked)
+- **GitHub project -> Project url**: https://github.com/jekhokie/scriptbox.git/
+- **Poll SCM**: (checked)
+- **Poll SCM -> Schedule**:  \* \* \* \* \*
+
+**Note**: The "Poll SCM -> Schedule" setting above will trigger Jenkins to inspect for any new commits
+every minute.
+
 Once you configure the above settings, press "Save" and kick off a build. Jenkins should use the
-Jenkinsfile within the project to kick off the build steps.
+Jenkinsfile within the project to kick off the build steps. You can also optionally create a commit
+and push to master for this repository, and the next minute Jenkins checks for changes it will also
+automatically trigger a build.
