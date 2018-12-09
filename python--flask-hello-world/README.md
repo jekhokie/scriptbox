@@ -43,15 +43,15 @@ configure this repository to be set up as a Pipeline within Jenkins (as of Jenki
 create a Pipeline project in Jenkins and under the "Pipeline" configuration, specify the
 following parameters:
 
-- *Definition*: Pipeline script from SCM
-- *SCM*: Git
-- *Repositories -> Repository URL*: https://github.com/jekhokie/scriptbox.git
-- *Repositories -> Credentials*: none
-- *Branches to build -> Branch Specifier (blank for 'any')*: \*/master
-- *Repository Browser*: (Auto)
-- *Additional Behaviors*: (None/Leave Default)
-- *Script Path*: python--flask-hello-world/jenkins/Jenkinsfile
-- *Lightweight checkout*: (checked)
+- **Definition**: Pipeline script from SCM
+- **SCM**: Git
+- **Repositories -> Repository URL**: https://github.com/jekhokie/scriptbox.git
+- **Repositories -> Credentials**: none
+- **Branches to build -> Branch Specifier (blank for 'any')**: \*/master
+- **Repository Browser**: (Auto)
+- **Additional Behaviors**: (None/Leave Default)
+- **Script Path**: python--flask-hello-world/jenkins/Jenkinsfile
+- **Lightweight checkout**: (checked)
 
 Once you configure the above settings, press "Save" and kick off a build. Jenkins should use the
 Jenkinsfile within the project to kick off the build steps.
