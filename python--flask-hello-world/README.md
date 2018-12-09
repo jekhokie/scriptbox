@@ -20,6 +20,15 @@ $ source .env/bin/activate
 $ pip install -r requirements.txt
 ```
 
+## Testing
+
+You can test the application by running the PyTest Unit test suite (which is what a CI pipeline
+in Jenkins or some other CI tool would use):
+
+```bash
+$ python -m pytest tests/test_app.py
+```
+
 ## Usage
 
 To start the Flask application, simply run the `run.py` script:
@@ -31,7 +40,9 @@ $ python run.py
 You can now open a browser and navigate to http://<SERVER_IP>:8000/ to see the Hello World Flask
 basic website.
 
-Note that there are Kubernetes YAML configuration files and a Docker file in this directory due to
+## Kubernetes
+
+There are Kubernetes YAML configuration files and a Docker file in this directory due to
 this repo being used as part of a larger tutorial on Kubernetes. Those files can be found in the
 `k8s/` directory.
 
