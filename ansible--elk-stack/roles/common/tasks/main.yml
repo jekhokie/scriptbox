@@ -20,6 +20,6 @@
   apt_repository:
     repo: deb https://artifacts.elastic.co/packages/6.x/apt stable main
     state: present
-    filename: elastic-6.x.list
+    filename: elastic-6.x
   become: yes
 ...
