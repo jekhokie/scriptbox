@@ -1,0 +1,24 @@
+---
+- name: Jenkins package
+  become: yes
+  apt:
+    name: jenkins
+    state: present
+
+- name: jenkins configuration file
+  become: yes
+  template:
+    src: jenkins.j2
+    dest: /etc/default/jenkins
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart jenkins
+
+- name: jenkins service
+  become: yes
+  service:
+    name: jenkins
+    state: started
+    enabled: yes
+...

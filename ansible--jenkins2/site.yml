@@ -1,0 +1,9 @@
+---
+- hosts: all
+  roles:
+    - common
+
+- hosts: jenkins2
+  roles:
+    - jenkins2
+...

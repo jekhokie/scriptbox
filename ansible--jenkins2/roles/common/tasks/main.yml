@@ -1,0 +1,24 @@
+---
+- name: package dependencies
+  apt:
+    name: "{{ packages }}"
+    state: present
+  become: yes
+  vars:
+    packages:
+      - openjdk-8-jre-headless
+      - curl
+
+- name: Jenkins GPG Key
+  apt_key:
+    url: https://pkg.jenkins.io/debian/jenkins-ci.org.key
+    state: present
+  become: yes
+
+- name: Jenkins repository
+  apt_repository:
+    repo: deb https://pkg.jenkins.io/debian-stable binary/
+    state: present
+    filename: jenkins
+  become: yes
+...
