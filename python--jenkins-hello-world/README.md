@@ -41,3 +41,28 @@ Following startup, you should be able to visit the following URL and see the Hel
 output printed in your browser (assuming this is running on your local machine):
 
 [http://localhost:80/](http://localhost:80/)
+
+## Jenkins
+
+Since this mini-project is embedded in a larger git repository, you will likely have to make
+adjustments to your git pull configuration for Jenkins. Below is a sample Jenkinsfile that could
+be used with this very specific repository and corresponding mini-project, which would end up having
+a stage for cloning the repository and a second stage for running the tests after switching into the
+directory containing this mini-project:
+
+```java
+node {
+   stage('Checkout Code') {
+      git 'https://github.com/jekhokie/scriptbox.git'
+   }
+   stage('Unit Test') {
+      // run the unit tests
+      dir("python--jenkins-hello-world") {
+         sh "virtualenv .env"
+         sh ". .env/bin/activate"
+         sh "pip install -r requirements.txt"
+         sh "python -m pytest tests/test_app.py"
+      }
+   }
+}
+```
