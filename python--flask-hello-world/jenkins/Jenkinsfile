@@ -4,7 +4,7 @@ node {
    }
    stage('Unit Test') {
       // run the unit tests
-      dir("python--jenkins-hello-world") {
+      dir("python--flask-hello-world") {
          sh "virtualenv .env"
          sh ". .env/bin/activate"
          sh "pip install -r requirements.txt"
