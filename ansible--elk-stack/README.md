@@ -40,7 +40,7 @@ $ ansible-playbook -i hosts site.yml
 Once the playbook completes, you should be able to log into the Kibana interface at the
 following URL:
 
-(http://10.11.13.15:5601/)[http://10.11.13.15:5601/]
+[http://10.11.13.15:5601/](http://10.11.13.15:5601/)
 
 Once you create your index pattern (something like "filebeat-*") you should be able to start
 parsing the system and audit logs from both hosts.

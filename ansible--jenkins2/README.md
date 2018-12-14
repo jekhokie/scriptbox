@@ -37,7 +37,7 @@ $ ansible-playbook -i hosts site.yml
 Once the playbook completes, you should be able to log into the Jeknins interface via the
 following URL:
 
-(http://10.11.13.15:8080/)[http://10.11.13.15:8080/]
+[http://10.11.13.15:8080/](http://10.11.13.15:8080/)
 
 Follow the instructions in the UI to proceed with the rest of the setup and usage of Jenkins.
 For starters, you'll likely need the activation code which can be found via running the following

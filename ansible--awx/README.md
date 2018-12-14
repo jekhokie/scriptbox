@@ -35,6 +35,6 @@ $ ansible-playbook -i hosts site.yml
 Once the playbook completes, you should be able to log into the AWX  interface at the
 following URL:
 
-(http://10.11.13.15/)[http://10.11.13.15/]
+[http://10.11.13.15/](http://10.11.13.15/)
 
 The default login username is `admin` and password is `password`.
