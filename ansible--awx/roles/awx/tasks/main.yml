@@ -1,0 +1,35 @@
+---
+- name: package dependencies
+  become: yes
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - epel-release
+      - git
+      - gettext
+      - ansible
+      - docker
+      - python-docker-py
+
+- name: docker service
+  become: yes
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: awx git repository
+  become: yes
+  git:
+    repo: https://github.com/ansible/awx.git
+    dest: /opt/awx
+
+- name: start awx
+  become: yes
+  shell:
+    cmd: ansible-playbook -i inventory install.yml && touch finished.txt
+    chdir: /opt/awx/installer
+    creates: /opt/awx/installer/finished.txt
+...
