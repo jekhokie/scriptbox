@@ -66,7 +66,7 @@ def get_subject_faces_and_ids():
             print("Training on image: {}".format(subject_image_path))
             image = cv2.imread(subject_image_path)
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            faces = fc.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5)
+            faces = fc.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=10)
 
             # ensure we get a face in the image - if not, exit fatally as something has gone wrong
             if len(faces) == 1:
@@ -74,7 +74,7 @@ def get_subject_faces_and_ids():
                 subject_faces.append(gray[y:y+h,x:x+w])
                 subject_ids.append(int(subject_id))
             else:
-                raise(Exception("Could not detect a face (or detected multiple faces) in file: {}".format(subject_image)))
+                print("ERR: Could not detect a face (or detected multiple faces) in file: {}".format(subject_image))
 
 get_subject_names()
 print("--------------------------------------")
@@ -99,7 +99,7 @@ while(True):
     # use classifier to detect, and recognizer to recognize
     ret, frame = cap.read()
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = fc.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5)
+    faces = fc.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=10)
 
     # calculate and display the containers for the faces
     for (x, y, w, h) in faces:
