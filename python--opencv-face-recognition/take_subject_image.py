@@ -9,8 +9,9 @@ import os
 import time
 from datetime import datetime
 
-# how long before the face detection kicks in
-COUNTDOWN_SECONDS = 10
+# how long before the face detection kicks in, how many images to capture, and GUI sizing
+COUNTDOWN_SECONDS = 5
+IMAGE_COUNT = 10
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 800
 
@@ -31,25 +32,22 @@ print("Picture will be taken in 10 seconds")
 raw_input("Image for subject {} will be taken next - please have subject present in front of camera, then press ENTER...".format(subject_id))
 
 # organize output contents by creating ID folder if it does not yet exist
-# and create a unique timestamp for the image based on the current date/time
-# that the script is run
 subject_folder = "subjects/{}".format(subject_id)
-start_time = datetime.now()
-image_name = start_time.strftime("%Y%m%d-%H%M%S.jpg")
 if not os.path.exists(subject_folder):
     os.makedirs(subject_folder)
 
 # set variables for whether a face was detected and loop until a face is captured
-captured = False
-while captured == False:
+image_count = 0
+while image_count < IMAGE_COUNT:
     # capture each frame of the video stream
     ret, frame = cap.read()
+    img_copy = frame.copy()
 
     # convert the frame to grayscale, which is what the classifier expects
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     # detect faces in the grayscale image using the classifier
-    faces = fc.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5)
+    faces = fc.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=10)
 
     # skip if no faces were detected, and
     # ensure we only have 1 subject in the frame, otherwise we won't have a good gold copy for the subject
@@ -63,18 +61,13 @@ while captured == False:
         # draw a rectangle indicating face detection
         cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
 
-        # keep track of our countdown timer
-        elapsed_time = datetime.now() - start_time
+        # keep track of date/time of image
+        image_name = datetime.now().strftime("%Y%m%d-%H%M%S.jpg")
 
-        # if the delay/timer has elapsed, store the image and quit
-        if elapsed_time.seconds > COUNTDOWN_SECONDS:
-            captured = True
-            cv2.imwrite("{}/{}".format(subject_folder, image_name), frame[y:y+h,x:x+w])
-            print("Captured and stored image as: {}/{}".format(subject_folder, image_name))
-        else:
-            # print the countdown timer on the window
-            cv2.putText(frame, str(COUNTDOWN_SECONDS - elapsed_time.seconds), (WINDOW_WIDTH/2, WINDOW_HEIGHT/2),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        cv2.imwrite("{}/{}".format(subject_folder, image_name), img_copy)
+        print("Captured and stored image as: {}/{}".format(subject_folder, image_name))
+        image_count += 1
+        time.sleep(1)
 
     cv2.imshow('image', frame)
     if cv2.waitKey(30) & 0xFF == 27:
