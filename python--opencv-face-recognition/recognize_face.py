@@ -66,7 +66,7 @@ def get_subject_faces_and_ids():
             print("Training on image: {}".format(subject_image_path))
             image = cv2.imread(subject_image_path)
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            faces = fc.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=10)
+            faces = fc.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5)
 
             # ensure we get a face in the image - if not, exit fatally as something has gone wrong
             if len(faces) == 1:

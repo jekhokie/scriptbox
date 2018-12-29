@@ -12,8 +12,8 @@ from datetime import datetime
 # how long before the face detection kicks in, how many images to capture, and GUI sizing
 COUNTDOWN_SECONDS = 5
 IMAGE_COUNT = 10
-WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 800
+WINDOW_WIDTH = 640
+WINDOW_HEIGHT = 480
 
 # create the classifier for faces
 fc = cv2.CascadeClassifier('classifiers/haarcascade_frontalface_default.xml')
@@ -41,7 +41,6 @@ image_count = 0
 while image_count < IMAGE_COUNT:
     # capture each frame of the video stream
     ret, frame = cap.read()
-    img_copy = frame.copy()
 
     # convert the frame to grayscale, which is what the classifier expects
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -58,13 +57,13 @@ while image_count < IMAGE_COUNT:
         continue
 
     for (x,y,w,h) in faces:
-        # draw a rectangle indicating face detection
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+        # perform histogram equalization for better contrast
+        gray_enhanced = cv2.equalizeHist(gray[y:y+h, x:x+w])
 
         # keep track of date/time of image
         image_name = datetime.now().strftime("%Y%m%d-%H%M%S.jpg")
 
-        cv2.imwrite("{}/{}".format(subject_folder, image_name), img_copy)
+        cv2.imwrite("{}/{}".format(subject_folder, image_name), gray_enhanced)
         print("Captured and stored image as: {}/{}".format(subject_folder, image_name))
         image_count += 1
         time.sleep(1)
