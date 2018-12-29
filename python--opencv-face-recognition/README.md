@@ -12,7 +12,7 @@ Install easy_install, pip and virtualenv. Then, clone this repository and naviga
 
 ```bash
 $ git clone https://<git_location>/scriptbox.git
-$ cd scriptbox/python--opencv-face-detection
+$ cd scriptbox/python--opencv-face-recognition
 ```
 
 Install the required environment and libraries:
