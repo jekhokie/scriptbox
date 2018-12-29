@@ -23,6 +23,19 @@ $ source .env/bin/activate
 $ pip install -r requirements.txt
 ```
 
+Finally, as a prerequisite, you'll want to ensure your subject mapping file is updated - note that the
+mapping file is simply a dictionary of ID/Name pairs which will be used to map identification by the
+recognizer to a subject name. You do not need to start at ID 0 but if you do not specify a zero subject,
+the program will create one due to the fact that the recognizer starts counting at zero (requiring a zero
+subject to offset).
+
+```bash
+$ cp config/subject_mappings.yml.sample config/subject_mappings.yml
+$ vim config/subject_mappings.yml
+# edit this file to update the IDs and names you will be creating
+# in the "Usage - Subject Images" section below
+```
+
 ## Usage - Subject Images
 
 First, you'll want a set of subject images to use. The helper script `capture_subject.py` can be used
