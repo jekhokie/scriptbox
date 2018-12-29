@@ -6,3 +6,6 @@
 
 # ignore temp excel files
 ~*
+
+# ignore the actual subject mappings
+config/subject_mappings.yml
