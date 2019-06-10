@@ -40,3 +40,40 @@ path for the InfluxDB instance to see that InfluxDB is running and various setti
 [http://10.11.13.50:8086/debug/vars](http://10.11.13.50:8086/debug/vars)
 
 From here, you should be off to the races!
+
+## Create Users for Authentication
+
+InfluxDB authentication only executes (even though enabled by default with this Ansible role) if there is
+an 'admin' user. Let's create an admin user to start:
+
+{% highlight bash %}
+$ influx -execute "CREATE USER admin WITH PASSWORD 'supersecretpassword' WITH ALL PRIVILEGES"
+{% endhighlight %}
+
+Now that an admin user exists, let's create a database and separate read and write users:
+
+{% highlight bash %}
+# create 'test' database
+$ influx -execute "CREATE DATABASE test"
+
+# create read-only user and grant privileges to 'test' DB
+$ influx -execute "CREATE USER ro_user WITH PASSWORD 'secretropassword'"
+$ influx -execute "GRANT READ ON test TO ro_user"
+
+# create read/write user and grant privileges to 'test' DB
+$ influx -execute "CREATE USER rw_user WITH PASSWORD 'secretrwpassword'"
+$ influx -execute "GRANT WRITE ON test TO rw_user"
+{% endhighlight %}
+
+At this point, you should be able to write data to the database using the 'rw_user' user, and only read
+data from the database using the 'ro_user' user:
+
+{% highlight bash %}
+# attempt to insert and read data with read/write user - should succeed
+$ influx -execute "INSERT cpu,host=testhost value=0.2" -database test -username rw_user -password secretrwpassword
+$ influx -execute "SELECT * FROM cpu" -database test -username rw_user -password secretrwpassword
+
+# attempt to insert and read data with read-only user - should fail on write/succeed on read
+$ influx -execute "INSERT cpu,host=testhost value=0.1" -database test -username ro_user -password secretropassword
+$ influx -execute "SELECT * FROM cpu" -database test -username ro_user -password secretropassword
+{% endhighlight %}
