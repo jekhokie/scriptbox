@@ -34,7 +34,7 @@ $ ansible-playbook -i hosts site.yml
 
 ## Check Jenkins
 
-Once the playbook completes, you should be able to log into the Jeknins interface via the
+Once the playbook completes, you should be able to log into the Jenkins interface via the
 following URL:
 
 [http://10.11.13.15:8080/](http://10.11.13.15:8080/)
