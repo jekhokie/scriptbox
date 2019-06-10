@@ -1,0 +1,7 @@
+---
+- name: restart influxdb
+  become: yes
+  service:
+    name: influxdb
+    state: restarted
+...

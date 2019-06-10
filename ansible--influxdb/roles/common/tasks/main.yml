@@ -1,0 +1,22 @@
+---
+- name: firewalld install
+  become: yes
+  yum:
+    name: firewalld
+    state: present
+
+- name: firewalld service
+  become: yes
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
+
+- name: ssh firewall access
+  become: yes
+  firewalld:
+    service: ssh
+    permanent: yes
+    state: enabled
+  notify: restart firewalld
+...

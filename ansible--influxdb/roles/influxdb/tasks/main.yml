@@ -1,0 +1,44 @@
+---
+- name: add influxdb repository
+  become: yes
+  yum_repository:
+    name: influxdb
+    description: InfluxDB Repository - RHEL $releasever
+    baseurl: https://repos.influxdata.com/rhel/$releasever/$basearch/stable
+    enabled: yes
+    gpgcheck: yes
+    gpgkey: https://repos.influxdata.com/influxdb.key
+    file: influxdb
+    state: present
+
+- name: install influxdb
+  become: yes
+  yum:
+    name: influxdb
+    state: present
+
+- name: influxdb configuration file
+  become: yes
+  template:
+    src: influxdb.conf.j2
+    dest: /etc/influxdb/influxdb.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart influxdb
+
+- name: influxdb service
+  become: yes
+  service:
+    name: influxdb
+    state: started
+    enabled: yes
+
+- name: influxdb firewall port settings
+  become: yes
+  firewalld:
+    port: 8086/tcp
+    permanent: yes
+    state: enabled
+  notify: restart firewalld
+...

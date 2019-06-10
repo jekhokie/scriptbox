@@ -1,0 +1,7 @@
+---
+- name: restart firewalld
+  become: yes
+  service:
+    name: firewalld
+    state: restarted
+...
