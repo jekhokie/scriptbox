@@ -1,0 +1,5 @@
+# ignore any temp Python files
+*.pyc
+
+# ignore the virtual environment directory
+.env
