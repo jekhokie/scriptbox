@@ -54,7 +54,7 @@ Now that an admin user exists, let's create a database and separate read and wri
 
 {% highlight bash %}
 # create 'test' database
-$ influx -execute "CREATE DATABASE test"
+$ influx -execute "CREATE DATABASE test" -username admin -password supersecretpassword
 
 # create read-only user and grant privileges to 'test' DB
 $ influx -execute "CREATE USER ro_user WITH PASSWORD 'secretropassword'"
