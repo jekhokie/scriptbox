@@ -1,0 +1,11 @@
+---
+- hosts: all
+  gather_facts: no
+  roles:
+    - common
+
+- hosts: grafana
+  gather_facts: no
+  roles:
+    - grafana
+...

@@ -1,0 +1,46 @@
+---
+- name: add grafana repository
+  become: yes
+  yum_repository:
+    name: grafana
+    description: grafana
+    baseurl: https://packages.grafana.com/oss/rpm
+    enabled: yes
+    gpgcheck: yes
+    gpgkey: https://packages.grafana.com/gpg.key
+    sslverify: yes
+    sslcacert: /etc/pki/tls/certs/ca-bundle.crt
+    file: grafana
+    state: present
+
+- name: install grafana
+  become: yes
+  yum:
+    name: grafana
+    state: present
+
+- name: grafana configuration file
+  become: yes
+  template:
+    src: grafana.ini.j2
+    dest: /etc/grafana/grafana.ini
+    owner: root
+    group: grafana
+    mode: 0640
+  notify: restart grafana
+
+- name: grafana service
+  become: yes
+  service:
+    name: grafana-server
+    state: started
+    enabled: yes
+
+- name: grafana firewall port settings
+  become: yes
+  firewalld:
+    port: 3000/tcp
+    permanent: yes
+    state: enabled
+  notify: restart firewalld
+...
