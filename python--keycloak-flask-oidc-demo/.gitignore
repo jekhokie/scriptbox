@@ -1,0 +1,12 @@
+# virtualenv
+.env
+
+# sensitive files
+config/settings.yml
+config/client_secrets.json
+
+# python temp files
+*.pyc
+
+# python cache
+__pycache__
