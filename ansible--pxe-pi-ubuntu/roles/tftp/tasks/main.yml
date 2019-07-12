@@ -1,0 +1,37 @@
+---
+- name: tftp packages and dependencies
+  become: yes
+  apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - tftp
+      - tftpd
+      - xinetd
+
+- name: tftpboot directory
+  become: yes
+  file:
+    path: /var/lib/tftpboot
+    state: directory
+    owner: nobody
+    mode: 0777
+
+- name: tftp configuration file
+  become: yes
+  template:
+    src: tftp.j2
+    dest: /etc/xinetd.d/tftp
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart tftp
+
+- name: tftp service
+  become: yes
+  service:
+    name: xinetd
+    state: started
+    enabled: yes
+...

@@ -1,0 +1,15 @@
+ddns-update-style none;
+default-lease-time 600;
+max-lease-time 7200;
+log-facility local7;
+
+allow booting;
+allow bootp;
+subnet 10.11.13.0 netmask 255.255.255.0 {
+  option routers 10.11.13.1;
+  option broadcast-address 10.11.13.255;
+  option domain-name-servers 10.11.13.15;
+  option domain-name "home.local";
+  next-server 10.11.13.15;
+  filename "pxelinux.0";
+}

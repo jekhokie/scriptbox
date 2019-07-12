@@ -1,0 +1,7 @@
+---
+- name: restart tftp
+  become: yes
+  service:
+    name: xinetd
+    state: restarted
+...

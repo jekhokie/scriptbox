@@ -1,0 +1,24 @@
+---
+- name: dhcp package
+  become: yes
+  apt:
+    name: isc-dhcp-server
+    state: present
+
+- name: dhcp configuration file
+  become: yes
+  template:
+    src: dhcpd.conf.j2
+    dest: /etc/dhcp/dhcpd.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart dhcp
+
+- name: dhcp service
+  become: yes
+  service:
+    name: isc-dhcp-server
+    state: started
+    enabled: yes
+...
