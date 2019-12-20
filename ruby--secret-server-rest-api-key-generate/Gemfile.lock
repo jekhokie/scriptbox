@@ -13,7 +13,7 @@ GEM
     nokogiri (1.9.1)
       mini_portile2 (~> 2.4.0)
     nori (2.6.0)
-    rack (1.6.4)
+    rack (2.0.8)
     savon (2.11.1)
       akami (~> 1.2)
       builder (>= 2.1.2)
