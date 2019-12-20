@@ -1,0 +1,6 @@
+# ignore the project audit results
+project_audit.json
+
+# ignore vim swap files
+*.swp
+*.swo

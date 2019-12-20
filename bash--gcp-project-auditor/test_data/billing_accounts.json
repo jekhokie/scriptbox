@@ -1,0 +1,22 @@
+[
+  {
+    "displayName": "Billing Account 1",
+    "name": "billingAccounts/QWIOGQ-129510-Q51WKD",
+    "open": true
+  },
+  {
+    "displayName": "Billing Account 2",
+    "name": "billingAccounts/AEE002-GQ9Q7E-123GHI",
+    "open": true
+  },
+  {
+    "displayName": "Billing Account 3",
+    "name": "billingAccounts/12G4TG-3451GB-193GBA",
+    "open": true
+  },
+  {
+    "displayName": "Billing Account 4",
+    "name": "billingAccounts/ASFDEGE-34GQWE-123523",
+    "open": true
+  }
+]
