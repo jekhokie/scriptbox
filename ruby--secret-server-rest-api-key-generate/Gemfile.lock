@@ -10,7 +10,7 @@ GEM
     httpi (2.4.1)
       rack
     mini_portile2 (2.4.0)
-    nokogiri (1.9.1)
+    nokogiri (1.10.8)
       mini_portile2 (~> 2.4.0)
     nori (2.6.0)
     rack (1.6.4)
