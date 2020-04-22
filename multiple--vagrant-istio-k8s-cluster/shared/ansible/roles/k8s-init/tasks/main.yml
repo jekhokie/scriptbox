@@ -1,0 +1,177 @@
+---
+- name: create kubernetes token
+  local_action:
+    module: command
+    _raw_params: "kubeadm token generate"
+  register: k8s_token
+  changed_when: no
+  when: ansible_hostname == "master"
+
+- name: store kubernetes token
+  copy:
+    content: "{{ k8s_token.stdout | trim }}"
+    dest: "{{ kube_env_artifact_dir }}/token"
+    force: no
+  when: ansible_hostname == "master"
+
+# note that these settings become available as part of
+# starting the docker engine on the host (the bridge/ directory
+# does not exist in /proc/sys/net/ until docker engine is started)
+- name: sysctl settings for bridge forwarding to iptables
+  sysctl:
+    name: "{{ item }}"
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_items:
+    - net.bridge.bridge-nf-call-iptables
+    - net.bridge.bridge-nf-call-ip6tables
+
+# this part is a hack - primary IP is an inaccessible 10.x range
+# so we need to parse what we know is an accessible range
+- name: get accessible ip address
+  shell: |
+    hostname -I | tr " " "\n" | grep {{ accessible_ip_prefix }}
+  register: master_ip
+  changed_when: no
+  when: ansible_hostname == "master"
+
+- name: store control plane host IP
+  copy:
+    content: "{{ master_ip.stdout | trim }}"
+    dest: "{{ kube_env_artifact_dir }}/control_plane_host"
+    force: no
+  when: ansible_hostname == "master"
+
+- name: initialize master
+  shell: |
+    kubeadm init --pod-network-cidr={{ pod_network_cidr }} \
+                 --apiserver-advertise-address={{ master_ip.stdout }} \
+                 --apiserver-cert-extra-sans=k8s.cluster.home \
+                 --token={{ lookup('file', '/vagrant_data/kubernetes/token') }}
+  args:
+    creates: /etc/kubernetes/admin.conf
+  when: ansible_hostname == "master"
+
+- name: copy kube admin.conf to vagrant shared
+  copy:
+    remote_src: yes
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ kube_env_artifact_dir }}/admin.conf"
+    mode: '0700'
+  when: ansible_hostname == "master"
+
+- name: create vagrant kubectl environment folder
+  file:
+    path: /home/vagrant/.kube
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0750'
+
+- name: configure kubectl for vagrant
+  copy:
+    remote_src: yes
+    src: "{{ kube_env_artifact_dir }}/admin.conf"
+    dest: /home/vagrant/.kube/config
+    owner: vagrant
+    group: vagrant
+    mode: '0700'
+
+- name: create root kubectl environment folder
+  file:
+    path: /root/.kube
+    state: directory
+    owner: root
+    group: root
+    mode: '0750'
+
+- name: configure kubectl for root
+  copy:
+    remote_src: yes
+    src: "{{ kube_env_artifact_dir }}/admin.conf"
+    dest: /root/.kube/config
+    owner: root
+    group: root
+    mode: '0700'
+
+# flannel network components - to use this, comment out the 'calico' components below
+#- name: create flannel pod network configuration spec
+#  template:
+#    src: kube-flannel.yaml.j2
+#    dest: /etc/kubernetes/kube-flannel.yaml
+#    owner: root
+#    group: root
+#    mode: '0750'
+#  when: ansible_hostname == "master"
+#
+# install flannel network overlay
+#- name: install and configure flannel pod network
+#  shell: |
+#    kubectl apply -f /etc/kubernetes/kube-flannel.yaml && touch /etc/kubernetes/.flannel_run
+#  args:
+#    creates: /etc/kubernetes/.flannel_run
+#  register: network_install
+#  when: ansible_hostname == "master"
+#
+# calico network components - to use this, comment out the 'flannel' components above
+- name: create calico pod network configuration spec
+  template:
+    src: kube-calico.yaml.j2
+    dest: /etc/kubernetes/kube-calico.yaml
+    owner: root
+    group: root
+    mode: '0750'
+  when: ansible_hostname == "master"
+
+- name: install and configure calico pod network
+  shell: |
+    kubectl apply -f /etc/kubernetes/kube-calico.yaml && touch /etc/kubernetes/.calico_run
+  args:
+    creates: /etc/kubernetes/.calico_run
+  register: network_install
+  when: ansible_hostname == "master"
+
+# bug workaround: https://github.com/kubernetes/kubernetes/issues/43856
+- name: fix qos kubelet initialize by restarting kubelets
+  shell: |
+    for i in $(systemctl list-unit-files --no-legend --no-pager -l | grep --color=never -o .*.slice | grep kubepod); do \
+      systemctl stop $i; \
+    done
+  when:
+    - ansible_hostname == "master"
+    - network_install.changed
+
+# need to ensure the ca.crt file exists in order to generate the correct hash
+# otherwise a ca hash difference will prevent workers from being able to join
+- name: wait for kubernetes ca to init
+  wait_for:
+    path: /etc/kubernetes/pki/ca.crt
+  when: ansible_hostname == "master"
+
+- name: discover kubernetes token hash
+  local_action:
+    module: shell
+    _raw_params: "openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'"
+  register: k8s_token_hash
+  changed_when: no
+  when: ansible_hostname == "master"
+  
+- name: store kubernetes token hash
+  copy:
+    content: "{{ k8s_token_hash.stdout | trim }}"
+    dest: "{{ kube_env_artifact_dir }}/token_hash"
+    force: no
+  when: ansible_hostname == "master"
+
+# worker node specific init
+- name: initialize worker
+  shell: |
+    kubeadm join --token="{{ lookup('file', '/vagrant_data/kubernetes/token') }}" \
+                 "{{ lookup('file', '/vagrant_data/kubernetes/control_plane_host') }}:6443" \
+                 --discovery-token-ca-cert-hash="sha256:{{ lookup('file', '/vagrant_data/kubernetes/token_hash') | trim }}"
+  args:
+    creates: /etc/kubernetes/kubelet.conf
+  when: ansible_hostname != "master"
+...

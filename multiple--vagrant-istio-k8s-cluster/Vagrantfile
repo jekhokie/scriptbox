@@ -1,0 +1,44 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+#
+# WARNING: If you update the private_network IP addresses, you *must*
+#          update the corresponding references in ansible
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/7"
+
+  config.vm.synced_folder "./shared", "/vagrant_data"
+
+  config.vm.define "master" do |vm_config|
+    vm_config.vm.hostname = "master"
+    vm_config.vm.network "private_network", ip: "10.11.12.13"
+    vm_config.vm.provision "shell", path: "initialize.sh"
+
+    vm_config.vm.provider "virtualbox" do |vb|
+      vb.memory = "4096"
+      vb.cpus   = 2
+    end
+  end
+
+  config.vm.define "node1" do |vm_config|
+    vm_config.vm.hostname = "node1"
+    vm_config.vm.network "private_network", ip: "10.11.12.14"
+    vm_config.vm.provision "shell", path: "initialize.sh"
+
+    vm_config.vm.provider "virtualbox" do |vb|
+      vb.memory = "4096"
+      vb.cpus   = 2
+    end
+  end
+
+  config.vm.define "node2" do |vm_config|
+    vm_config.vm.hostname = "node2"
+    vm_config.vm.network "private_network", ip: "10.11.12.15"
+    vm_config.vm.provision "shell", path: "initialize.sh"
+
+    vm_config.vm.provider "virtualbox" do |vb|
+      vb.memory = "4096"
+      vb.cpus   = 2
+    end
+  end
+end

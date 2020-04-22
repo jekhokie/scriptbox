@@ -1,0 +1,54 @@
+---
+- name: add docker repository
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docer-ce.repo
+
+- name: install docker-ce
+  yum:
+    name: "{{ docker_packages }}"
+    state: present
+  vars:
+    docker_packages:
+      - containerd.io
+      - docker-ce
+      - docker-ce-cli
+
+- name: add vagrant user to docker group
+  user:
+    name: vagrant
+    groups: docker
+
+- name: add root user to docker group
+  user:
+    name: root
+    groups: docker
+
+- name: create docker systemd directory
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0750'
+
+- name: create docker directory
+  file:
+    path: /etc/docker
+    state: directory
+    owner: root
+    group: root
+    mode: '0750'
+
+- name: specify docker daemon config
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+  notify: "restart docker"
+
+- name: start docker
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+...

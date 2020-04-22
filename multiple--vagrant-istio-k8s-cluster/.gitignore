@@ -1,0 +1,8 @@
+*.swp
+*.swo
+
+# ignore temp files created by the cluster
+shared/kubernetes/*
+
+# ignore vagrant resources
+.vagrant

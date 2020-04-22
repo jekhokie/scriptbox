@@ -1,0 +1,23 @@
+---
+- name: add kubernetes repository
+  copy:
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+
+- name: install kubernetes components
+  yum:
+    name: "{{ docker_packages }}"
+    state: present
+    disable_excludes: kubernetes
+  vars:
+    docker_packages:
+      - kubelet
+      - kubeadm
+      - kubectl
+  notify: "restart kubelet"
+
+- name: enable kubelet
+  systemd:
+    name: kubelet
+    enabled: yes
+...

@@ -1,0 +1,43 @@
+---
+- name: install dependencies
+  yum:
+    name: "{{ dependencies }}"
+    state: present
+  vars:
+    dependencies:
+      - vim
+      - device-mapper-persistent-data
+      - lvm2
+      - net-tools
+      - nc
+
+- name: sysctl settings for ipv4 forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: disable swap
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+
+- name: disable swap in fstab
+  mount:
+    name: swap
+    fstype: swap
+    state: absent
+
+- name: disable selinux
+  selinux:
+    state: disabled
+
+- name: set /etc/hosts
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: '0644'
+...
