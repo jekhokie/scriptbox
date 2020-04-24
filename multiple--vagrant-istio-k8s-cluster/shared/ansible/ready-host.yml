@@ -8,7 +8,7 @@
   vars:
     kube_env_artifact_dir: /vagrant_data/kubernetes
     accessible_ip_prefix: "10.11"
-    pod_network_cidr: "172.16.0.0/24"
+    pod_network_cidr: "10.12.0.0/24"
   roles:
     - common
     - docker-ce
