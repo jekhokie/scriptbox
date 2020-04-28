@@ -165,6 +165,14 @@
     force: no
   when: ansible_hostname == "master"
 
+# enable firewall port for remote kube-apiserver (kubectl) interaction
+- name: kube-apiserver firewall enable
+  firewalld:
+    port: 6443/tcp
+    permanent: yes
+    state: enabled
+    immediate: yes
+
 # worker node specific init
 - name: initialize worker
   shell: |
