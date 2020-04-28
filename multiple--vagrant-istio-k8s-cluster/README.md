@@ -30,6 +30,16 @@ Guest additions for local storage sharing automatically on boot of the VM instan
 $ vagrant plugin install vagrant-vbguest
 ```
 
+Next, you'll want to use a box that already has guest additions installed if at all possible. The above sets
+the environment up in case you discover/use boxes that don't already have guest additions installed, but ideally
+you'll want these pre-installed as the provisioning process takes a few minutes (longer than reasonable). If
+you decide not to run the following commands, you'll want to edit the `Vagrantfile` to specify the correct box
+to use as the existing `Vagrantfile` in this repo declares the box to be used in this tutorial:
+
+```bash
+$ vagrant box add centos7-with-guest https://github.com/vezzoni/vagrant-vboxes/releases/download/0.0.1/centos-7-x86_64.box
+```
+
 Additionally, each time you run the `vagrant up master` command, temporary artifacts will be created in the
 Vagrant shared directory. Make sure if you are tearing down/re-building a cluster, you clean the directory
 first (all contents, including tokens, etc.) as this directory contains artifacts that, if not removed, will
