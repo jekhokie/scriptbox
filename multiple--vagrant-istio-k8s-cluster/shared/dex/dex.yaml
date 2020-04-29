@@ -1,0 +1,150 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: auth-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dex
+  namespace: auth-system
+data:
+  config.yaml: |
+    issuer: https://10.11.12.13:30000/dex
+
+    storage:
+      type: kubernetes
+      config:
+        inCluster: true
+
+    web:
+      https: 0.0.0.0:5554
+      tlsCert: /etc/ssl/certs/cert.pem
+      tlsKey: /etc/ssl/certs/key.pem
+
+    logger:
+      level: "debug"
+      format: text
+
+    staticClients:
+    - id: oidc-auth-client
+      redirectURIs:
+      - 'http://10.11.12.13:30001/callback'
+      name: 'oidc-auth-client'
+
+    connectors:
+    - type: ldap
+      id: ldap
+      name: LDAP
+      config:
+        host: 10.11.12.13:30595
+        insecureNoSSL: true
+        insecureSkipVerify: true
+        bindDN: CN=admin,dc=example,dc=org
+        bindPW: abcd1234
+        userSearch:
+          baseDN: ou=users,dc=example,dc=org
+          filter: "(objectClass=posixAccount)"
+          username: uid
+          idAttr: uid
+          emailAttr: mail
+          nameAttr: gecos
+        groupSearch:
+          baseDN: ou=groups,dc=example,dc=org
+          filter: "(objectClass=groupOfUniqueNames)"
+          userAttr: DN
+          groupAttr: uniqueMember
+          nameAttr: cn
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dex
+  namespace: auth-system
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: dex
+  namespace: auth-system
+rules:
+- apiGroups: ["dex.coreos.com"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: dex
+  namespace: auth-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dex
+subjects:
+- kind: ServiceAccount
+  name: dex
+  namespace: auth-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: dex
+  name: dex
+  namespace: auth-system
+spec:
+  selector:
+    matchLabels:
+      app: dex
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dex
+    spec:
+      serviceAccountName: dex
+      containers:
+      - image: quay.io/coreos/dex:v2.9.0
+        name: dex
+        command: ["dex", "serve", "/etc/dex/cfg/config.yaml"]
+        ports:
+        - name: http
+          containerPort: 5556
+        volumeMounts:
+        - name: config
+          mountPath: /etc/dex/cfg
+        - name: etc-ssl-certs
+          mountPath: /etc/ssl/certs
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: dex
+          items:
+          - key: config.yaml
+            path: config.yaml
+      - name: etc-ssl-certs
+        hostPath:
+          path: /etc/ssl/certs
+          type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dex
+  namespace: auth-system
+spec:
+  selector:
+    app: dex
+  type: NodePort
+  ports:
+  - name: dex
+    port: 5554
+    nodePort: 30000
+    protocol: TCP
+    targetPort: 5554
+...

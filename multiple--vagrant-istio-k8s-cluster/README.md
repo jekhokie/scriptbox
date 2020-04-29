@@ -20,6 +20,13 @@ Kubernetes/other plugins used:
 
 - Calico (networking)
 
+## Some Notes
+
+This repository has a lot more in it than just creating a Vagrant k8s cluster. There are many sub-directories
+not mentioned in this README file. Specifically, the contents of this repo also support the blog
+[https://jekhokie.github.io](https://jekhokie.github.io) and you can see much of its contents used in several
+Kubernetes-focused tutorials in that blog.
+
 ## Prerequisites
 
 This repo assumes that you already have a functioning Vagrant + VirtualBox setup. In addition, you need

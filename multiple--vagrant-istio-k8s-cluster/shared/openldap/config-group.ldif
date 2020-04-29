@@ -1,0 +1,9 @@
+dn: ou=groups,dc=example,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+dn: cn=testgrp,ou=groups,dc=example,dc=org
+objectClass: groupOfUniqueNames
+cn: testgrp
+uniqueMember: uid=jsmith,ou=users,dc=example,dc=org

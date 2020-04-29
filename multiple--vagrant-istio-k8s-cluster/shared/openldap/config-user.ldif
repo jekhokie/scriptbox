@@ -1,0 +1,22 @@
+# config users
+dn: ou=users,dc=example,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+
+# config jsmith
+dn: uid=jsmith,ou=users,dc=example,dc=org
+objectClass: top
+objectClass: posixAccount
+objectClass: inetOrgPerson
+description: Test user
+cn: jsmith
+sn: Smith
+uid: jsmith
+userPassword: {SSHA}FB4s71qplmiQZW7Rbqf0+WlPExBjaG8f
+uidNumber: 1001
+gidNumber: 1001
+homeDirectory: /home/jsmith
+mail: jsmith@test.com
+loginShell: /bin/bash
+gecos: John Smith

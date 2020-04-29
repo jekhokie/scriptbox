@@ -1,0 +1,107 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gangway
+  namespace: auth-system
+data:
+  gangway.yaml: |
+    clusterName: "k8s-gangway"
+    authorizeURL: "https://10.11.12.13:30000/dex/auth"
+    tokenURL: "https://10.11.12.13:30000/dex/token"
+    redirectURL: "http://10.11.12.13:30001/callback"
+    clientID: "oidc-auth-client"
+    allowEmptyClientSecret: true
+    usernameClaim: "email"
+    emailClaim: "email"
+    apiServerURL: "https://10.11.12.13:6443"
+    trustedCAPath: "/cacerts/ca.pem"
+    scopes: ["groups", "openid", "profile", "email", "offline_access"]
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gangway-key
+  namespace: auth-system
+type: Opaque
+stringData:
+  sessionkey: supertestsecret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: gangway
+  name: gangway
+  namespace: auth-system
+spec:
+  selector:
+    matchLabels:
+      app: gangway
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gangway
+    spec:
+      containers:
+      - image: gcr.io/heptio-images/gangway:v3.1.0
+        name: gangway
+        command: ["gangway", "-config", "/gangway/gangway.yaml"]
+        env:
+        - name: SESSION_SECURITY_KEY
+          valueFrom:
+            secretKeyRef:
+              name: gangway-key
+              key: sessionkey
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        volumeMounts:
+        - name: gangway
+          mountPath: /gangway/
+        - name: oidc-tls-ca
+          mountPath: /cacerts
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 20
+          timeoutSeconds: 1
+          periodSeconds: 60
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          timeoutSeconds: 1
+          periodSeconds: 10
+          failureThreshold: 3
+      volumes:
+        - name: gangway
+          configMap:
+            name: gangway
+        - name: oidc-tls-ca
+          hostPath:
+            path: /vagrant_data/dex/ssl
+            type: Directory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: gangway
+  name: gangwaysvc
+  namespace: auth-system
+spec:
+  selector:
+    app: gangway
+  type: NodePort
+  ports:
+  - name: "http"
+    protocol: TCP
+    nodePort: 30001
+    port: 80
+    targetPort: "http"
+...

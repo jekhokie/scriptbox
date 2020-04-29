@@ -3,6 +3,7 @@
 
 # ignore temp files created by the cluster
 shared/kubernetes/*
+shared/dex/ssl/*
 
 # ignore vagrant resources
 .vagrant
