@@ -1,0 +1,11 @@
+# ignore any temp Python files
+*.pyc
+
+# ignore the virtual environment directory
+.env
+
+# ignore pycache
+__pycache__
+
+# ignore settings
+config/settings.yaml

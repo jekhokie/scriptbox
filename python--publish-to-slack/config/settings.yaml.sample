@@ -1,0 +1,3 @@
+slack:
+  bot_token: <SUPER_SECRET_OAUTH_TOKEN>
+  channel: <CHANNEL_ID>
