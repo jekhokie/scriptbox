@@ -4,6 +4,7 @@
 # ignore temp files created by the cluster
 shared/kubernetes/*
 shared/dex/ssl/*
+shared/opa/ssl/*
 
 # ignore vagrant resources
 .vagrant
