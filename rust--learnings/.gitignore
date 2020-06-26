@@ -1,0 +1,6 @@
+# ignore the default binaries created using
+# rustc in some of the earlier learnings
+main
+
+# ignore all built binaries
+**/target/
