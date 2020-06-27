@@ -41,10 +41,24 @@ named according to the chapter of the following book, from which the correspondi
 - Statement: Instruction that performs some action and does not return a value (e.g. `let`), and therefore cannot be assigned to other variables.
 - Expression: Evaluates to a resulting value.
 - Conditionals: Use same concept of "arms" as match conditions.
+- Stack: All data put on stack (LIFO) must have fixed, known size, otherwise put in heap (slower).
+- Heap: Place for dynamically sized data, typically slower, and requires memory pointers for retrieval.
+- Borrowing: Using reference pointers that point to the original reference pointer of a variable, thus allowing modification but never taking ownership - does not allow modifications to the borrowed value (read-only).
+- Slice: Contiguous sequence of elements in a collection (instead of whole collection) - no ownership.
+- Struct: Custom data type to name and package torgether related values (like object data attributes), having fields - use dot `.` notation with field name to access fields.
+- Struct Tuple: Same as structs, but fields don't have names (have types in fields instead) - use dot `.` notation with numeric indexes to access fields.
+- Unit-Like Structs: Struct that doesn't have any fields.
+- Method: Similar to a function, but defined within a Struct (or enum, or trait).
+- Implementation (`impl`): Used to define methods on Structs (or enums, or traits).
+- Associated Function: Define a function within a Struct, usually used to initialize a struct with a default value (constructor) - uses `::` syntax.
+- Enumeration (Enum): Define a type by enumerating its possible variants.
+- Pattern Matching: `match` where the first hit applies.
 
 ## Starter Syntax
 
-- `println!(...)`: Prints text to the console.
+- `println!(... {}, x)`: Prints text to the console, interpolating `x`.
+- `println!(... {:?}, Struct)`: Prints to the console, printing debug to support printing the Struct fields (requires annotation `#[derive(Debug)]`).
+- `println!(... {:#?}, Struct)`: Prettier debug information (easier for larger Structs).
 - `let ...`: Defines a variable, immutable by default.
 - `let mut ...`: Defines a mutable variable.
 - `let guess: u32 ...`: Defines immutable variable of type u32.
@@ -54,6 +68,23 @@ named according to the chapter of the following book, from which the correspondi
 - `....expect("this is an error");`: Takes `Result` of `Ok` and returns value, or `Err` and returns message.
 - `loop {...}`: Loops.
 - `match ... {...}`: Match expression and resulting "arms" to evaluate.
+- `x.clone()`: Deep copy a variable (not needed with fixed-length vars, which sit on the Stack).
+- `x.len()`: Calculate length of variable.
+- `... = String::from("some string")`: Construct `String` variable, stored in heap with pointer in stack.
+- `... = "x"`: Construct literal, stored in stack (faster), and immutable as it is technically a slice.
+- `x.as_bytes()`: Convert `String` to array of bytes.
+- `x.iter()`: Returns each element in a collection.
+- `x.iter().enumerate()`: Wraps result of `iter` and returns each element as part of a tuple.
+- `b' '`: Byte-literal syntax for a space character (char).
+- `x.clear()`: Empties a String, making it equal to "".
+- `struct Something...`: Define a struct.
+- `..x`: When used in struct instantiation, assigns all unassigned values from `x` to the new instance.
+- `enum Something...`: Define an enum.
+- `Option<T>`: Special enum type that can be something or nothing.
+- `None`: Failure or lack of value in `Option<T>`.
+- `Some(value)`: Tuple struct that wraps a `value` with type `T` in `Option<T>`.
+- `match x {...}`: Pattern match operation with many "arms" (similar to a case operation, or switch).
+- `()`: Unit value (nothing).
 
 ## Random Notes
 
@@ -67,3 +98,13 @@ named according to the chapter of the following book, from which the correspondi
 - Shadow variables are useful for changing immutable variable types (whereas mutable variables cannot do this unless you start with a mutable and convert to immutable and use the `let` directive).
 - Rust is statically typed (must know types of all variables at compile time).
 - Integer overflow for releases (production) result in complement wrapping, not errors (e.g. it will assign 256 to 0, 257 to 1, 258 to 2 in an 8-bit integer that overflows).
+- Some types require heap (undefined size), and these types result in stack pointers/data. Copying (re-assigning) these variables results in a "move", where the previous variable is invalidated in the stack (data is not necessarily copied) to avoid double-free memory operations (where both variables on the stack result in attempting to free the same segment in memory on a free operation).
+- To do a deep copy operation, use `clone`.
+- Fixed-length types can be re-assigned because the copy is implicit, super-fast, and only exists on the Stack.
+- Can only have 1 mutable reference to a particular piece of data within a scope, unless the second reference is after the last occurrence/use by the first reference..
+- Rule: At any given time, you can have either one mutable reference or any number of immutable references.
+- Implementations (`impl`) always have `self` as the first paramter and can be either reference/immutable using `&self` or mutable using `&mut self`.
+- There is no null feature in Rust - only `Option<T>`. When using `None`, you must tell Rust what type the `Option` should be (e.g. `Option<i32>`)..
+- You have to convert an `Option<T>` to a `T` before performing operations on `T`.
+- Common Rust pattern: `match` against an enum, bind a variable to the data inside, and execute code based on it.
+- Pattern matching *must* include an exhausive list of option, including `None` (can use `_` as a fallback and assign it to `()` (unit value, meaning nothing)..
