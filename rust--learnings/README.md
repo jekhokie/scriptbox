@@ -53,6 +53,13 @@ named according to the chapter of the following book, from which the correspondi
 - Associated Function: Define a function within a Struct, usually used to initialize a struct with a default value (constructor) - uses `::` syntax.
 - Enumeration (Enum): Define a type by enumerating its possible variants.
 - Pattern Matching: `match` where the first hit applies.
+- Package: Cargo feature that lets you build, test, and share crates.
+- Crate: Tree of modules that produce a library or executable.
+- Module and use: Control organization, scope, and privacy of paths.
+- Path: Way of naming an item such as a struct, function, or module.
+- `src/main.rs`: Convention for crate root of a binary crate.
+- `src/lib.rs`: Convention for crate root of a library crate.
+- Vector: Stores multiple values next to each other in memory, each of the same type - to store different types, use an enum to wrap the types, and then create a vector of that enum..
 
 ## Starter Syntax
 
@@ -85,6 +92,11 @@ named according to the chapter of the following book, from which the correspondi
 - `Some(value)`: Tuple struct that wraps a `value` with type `T` in `Option<T>`.
 - `match x {...}`: Pattern match operation with many "arms" (similar to a case operation, or switch).
 - `()`: Unit value (nothing).
+- `mod ...`: Define a module.
+- `pub ...`: Define a public item.
+- `use ...`: Bring a module path into scope to shorthand the calling of the functionality.
+- `... as ...`: Provide new name/alias for a type being imported with `use`.
+- `pub use ...`: Making/re-exporting code to bring an item into scope and make it available to others in their scope.
 
 ## Random Notes
 
@@ -108,3 +120,6 @@ named according to the chapter of the following book, from which the correspondi
 - You have to convert an `Option<T>` to a `T` before performing operations on `T`.
 - Common Rust pattern: `match` against an enum, bind a variable to the data inside, and execute code based on it.
 - Pattern matching *must* include an exhausive list of option, including `None` (can use `_` as a fallback and assign it to `()` (unit value, meaning nothing)..
+- Can use a nested path to bring items into scope using `use std::{cmp::Ordering, io};`.
+- Writing `use std::io; \n use std::io::Write;` is the same as `use std::io{self, Write};`.
+- All items in Rust are private by default.
