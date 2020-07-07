@@ -1,0 +1,3 @@
+image_source_dir:      '<SOURCE_DIR>'     # source directory where all original images are located
+image_destination_dir: '<TARGET_DIR>'     # target directory where images should be copied to with new filenames
+kml_destination_dir:   '<TARGET_KML_DIR>' # target directory where the Google Earth KML file should be placed
