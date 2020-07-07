@@ -1,0 +1,29 @@
+---
+- name: ansible group
+  group:
+    name: ansible
+    state: present
+  become: true
+
+- name: ansible user
+  user:
+    name: ansible
+    comment: "Ansible user"
+    group: ansible
+  become: true
+
+- name: ansible user passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^ansible'
+    line: 'ansible ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+  become: true
+
+- name: ansible authorized_keys
+  authorized_key:
+    user: ansible
+    key: "{{ lookup('file', 'roles/common/files/ansible.pub') }}"
+    state: present
+  become: true

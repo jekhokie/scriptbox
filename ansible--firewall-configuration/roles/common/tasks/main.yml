@@ -1,0 +1,5 @@
+---
+- name: configure iptables
+  copy: src=iptables dest=/etc/sysconfig/iptables
+  notify: restart iptables
+  become: true
