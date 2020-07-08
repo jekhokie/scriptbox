@@ -97,6 +97,16 @@ named according to the chapter of the following book, from which the correspondi
 - `use ...`: Bring a module path into scope to shorthand the calling of the functionality.
 - `... as ...`: Provide new name/alias for a type being imported with `use`.
 - `pub use ...`: Making/re-exporting code to bring an item into scope and make it available to others in their scope.
+- `data.to_string()`: Load data into a String.
+- `data.push_str('test')`: Append a string slice to a String.
+- `data.push('a')`: Append a character to a String.
+- `format!("{}-{}-{}", x, y, z)`: Concatenate a string/interpolate variables.
+- `data.chars()`: Iterate over each character in a String.
+- `data.bytes()`: Iterate over each byte in a String.
+- `HashMap::new()`: Create a new HashMap.
+- `data.insert(x, 10)`: Insert key/value into a HashMap.
+- `data.get("KeyA")`: Get a value out of a HashMap based on the key name.
+- `data.entry(String::from("KeyA")).or_insert(30)`: Only insert value at key if it doesn't already exist.
 
 ## Random Notes
 
@@ -123,3 +133,5 @@ named according to the chapter of the following book, from which the correspondi
 - Can use a nested path to bring items into scope using `use std::{cmp::Ordering, io};`.
 - Writing `use std::io; \n use std::io::Write;` is the same as `use std::io{self, Write};`.
 - All items in Rust are private by default.
+- Strings are UTF-8 encoded.
+- For a HashMap, data is stored in Heap, and all keys must have the same type/all values must have the same type.
