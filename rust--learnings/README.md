@@ -107,8 +107,13 @@ named according to the chapter of the following book, from which the correspondi
 - `data.insert(x, 10)`: Insert key/value into a HashMap.
 - `data.get("KeyA")`: Get a value out of a HashMap based on the key name.
 - `data.entry(String::from("KeyA")).or_insert(30)`: Only insert value at key if it doesn't already exist.
+- `panic = 'abort'`: Used for aborting (instead of unwinding call stack) in a terminal failure - can help with making smaller binaries.
+- `RUST_BACKTRACE=1`: Added to command line `cargo run`, will add backtrace information (e.g. call stack) if a `panic!` is encountered to help troubleshoot.
+- `...unwrap()`: Returns the value inside the `Ok` if successful, otherwise calls the `panic!` macro.
+- `...expect("Does not exist")`: Alternative to `unwrap()` allowing for custom error message during `panic!`.
+- `...?`: Using `?` will return result inside `Ok` if successful or return the entire `Err` if unsuccessful. If `Err` is returned, the error type returned is converted into the return `Err` type defined by the function (consistent error types for all failures within the function). Can only be used in a function returning a `Result<T, E>` type (never in `main()` unless the `main()` function signature is updated to return `Result<(), Box<dyn Error>>`).
 
-## Random Notes
+## Other Notes
 
 - Indent with 4x spaces (no tabs).
 - Name files with underscores separating words.
@@ -135,3 +140,5 @@ named according to the chapter of the following book, from which the correspondi
 - All items in Rust are private by default.
 - Strings are UTF-8 encoded.
 - For a HashMap, data is stored in Heap, and all keys must have the same type/all values must have the same type.
+- 2 types of errors - one that returns a `Result<T, E>` (recoverable) and one that triggers `panic!` (unrecoverable).
+- Good to use `unwrap` and `expect` in example/prototype code to indicate where actual error handling might need to be matured before production use.
