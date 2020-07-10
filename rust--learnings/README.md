@@ -60,6 +60,9 @@ named according to the chapter of the following book, from which the correspondi
 - `src/main.rs`: Convention for crate root of a binary crate.
 - `src/lib.rs`: Convention for crate root of a library crate.
 - Vector: Stores multiple values next to each other in memory, each of the same type - to store different types, use an enum to wrap the types, and then create a vector of that enum..
+- Generic: Can take multiple forms/left undefined.
+- Trait: Tells Rust compiler about functionality a particular type has and can share with other types (similar to `interfaces`)..
+- Lifetimes: Functionality used to prevent dangling references.
 
 ## Starter Syntax
 
@@ -112,6 +115,14 @@ named according to the chapter of the following book, from which the correspondi
 - `...unwrap()`: Returns the value inside the `Ok` if successful, otherwise calls the `panic!` macro.
 - `...expect("Does not exist")`: Alternative to `unwrap()` allowing for custom error message during `panic!`.
 - `...?`: Using `?` will return result inside `Ok` if successful or return the entire `Err` if unsuccessful. If `Err` is returned, the error type returned is converted into the return `Err` type defined by the function (consistent error types for all failures within the function). Can only be used in a function returning a `Result<T, E>` type (never in `main()` unless the `main()` function signature is updated to return `Result<(), Box<dyn Error>>`).
+- `fn largest<T>(list: &[T]) -> T { ... }`: Define generic function signature.
+- `struct Point<T> { ... }`: Define a generic type of struct.
+- `struct Point<T, U> { ... }`: Define generic type of struct that can have different types of parameters.
+- `enum Option<T> { ... }`: Define a generic type of enum.
+- `impl ... for ... { ... }`: Implementation of a trait for a type.
+- `&'a str`: Lifetime parameter `'a` on a `str` type.
+- `&'a mut str`: Lifetime parameter `'a` on a mutable `str` type.
+- `&'static`: Lifetime parameter stating references can live for entire duratin of program - this reference then gets baked into the compiled binary specifically.
 
 ## Other Notes
 
@@ -142,3 +153,6 @@ named according to the chapter of the following book, from which the correspondi
 - For a HashMap, data is stored in Heap, and all keys must have the same type/all values must have the same type.
 - 2 types of errors - one that returns a `Result<T, E>` (recoverable) and one that triggers `panic!` (unrecoverable).
 - Good to use `unwrap` and `expect` in example/prototype code to indicate where actual error handling might need to be matured before production use.
+- No (or little) performance penalty when using generics due to the fact that Rust compiles generic code into code that specifies the type for each instance (monomorphization).
+- Blanket trait implementations conditionally implement a trait for *any* type that implements another trait.
+- Rust has "conventions" or patterns known as `lifetime elision rules` which prevent the need to use lifetimes in some function signatures because they are pre-baked into the compiler as a result of frequent use (to reduce code duplication).
