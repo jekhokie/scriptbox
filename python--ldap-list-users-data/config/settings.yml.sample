@@ -1,0 +1,11 @@
+# LDAP settings
+host: some.ldap.fqdn                # ldap host
+protocol: ldaps                     # either ldaps or ldap - best to use TLS
+user: youruser@yourdomain.com       # bind username for simple auth
+passwd: your_password               # bind password for simple auth
+base_dn: OU=Users,DC=example,DC=com # base distinguished name to start a query from
+
+# users to be queried
+users:
+  - John Smith
+  - Jane Doe
