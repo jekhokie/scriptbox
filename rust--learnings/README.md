@@ -14,6 +14,13 @@ named according to the chapter of the following book, from which the correspondi
 - `cargo build --release`: Create binary `target/release/main`.
 - `cargo doc --open`: Open documentation for dependencies in `Cargo.yaml`.
 - `cargo update`: Update dependencies defined in `Cargo.yaml` to latest available per version spec.
+- `cargo test`: Run tests (all that are labeled with `#[test]`).
+- `cargo test -- --test-threads=1`: Run all tests sequentially instead of in parallel by default.
+- `cargo test -- --show-output`: Print any `println!(...)` messages when running tests (silenced otherwise).
+- `cargo test fn_name`: Run a particular test, or any tests that match (results in `filtered out` results).
+- `cargo test mod_name`: Run all tests within a module matching this name.
+- `cargo test -- --ignored`: Run all tests annotated with `#[ignored]`.
+- `cargo test --test integration_test`: Run all tests in an integration test file `integration_test.rs`.
 
 ## Semantics
 
@@ -123,6 +130,12 @@ named according to the chapter of the following book, from which the correspondi
 - `&'a str`: Lifetime parameter `'a` on a `str` type.
 - `&'a mut str`: Lifetime parameter `'a` on a mutable `str` type.
 - `&'static`: Lifetime parameter stating references can live for entire duratin of program - this reference then gets baked into the compiled binary specifically.
+- `assert!(...)`: Test that something is true.
+- `use super::*`: Brings anything defined in outer module into scope for a test module.
+- `assert_eq!(...)`: Test that two items are equal.
+- `assert_ne!(...)`: Test that two items are not equal.
+- `#[should_panic]`: Attribute indicating that a test should panic/throw an exception.
+- `#[ignore]`: Attribute indicating a test should be skipped - added after the `#[test]` attribute.
 
 ## Other Notes
 
@@ -156,3 +169,8 @@ named according to the chapter of the following book, from which the correspondi
 - No (or little) performance penalty when using generics due to the fact that Rust compiles generic code into code that specifies the type for each instance (monomorphization).
 - Blanket trait implementations conditionally implement a trait for *any* type that implements another trait.
 - Rust has "conventions" or patterns known as `lifetime elision rules` which prevent the need to use lifetimes in some function signatures because they are pre-baked into the compiler as a result of frequent use (to reduce code duplication).
+- To use `assert_eq!(...)` and `assert_ne!(...)` for a struct or enum, you must implement the PartialEq (check if values are in fact equal) and Debug (print values when assertion fails) traits. Can usually be derived as `#[derive(PartialEq, Debug)]`.
+- Running `cargo test` without any options results in tests running in parallel - be careful about tests that depend on each other in this case.
+- Unit tests: Convention is to create a `mod tests { ... }` module in each of the files in the `src/` directory containing unit tests for the file's functionality, annotating the module with `#[cfg(test)]` so the `tests` module is not included with the build binary.
+- Integration tests: Exist as individual files in the `tests/` directory (sibling directory of `src/`).
+- Create a `tests/common/mod.rs` file for shared code among other integration tests.
