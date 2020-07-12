@@ -174,3 +174,8 @@ named according to the chapter of the following book, from which the correspondi
 - Unit tests: Convention is to create a `mod tests { ... }` module in each of the files in the `src/` directory containing unit tests for the file's functionality, annotating the module with `#[cfg(test)]` so the `tests` module is not included with the build binary.
 - Integration tests: Exist as individual files in the `tests/` directory (sibling directory of `src/`).
 - Create a `tests/common/mod.rs` file for shared code among other integration tests.
+- Reserve `main.rs` for:
+  - Calling command line parsing logic with the argument values.
+  - Setting up any other configuration.
+  - Calling a `run` function in `lib.rs`.
+  - Handling the error if `run` returns an error.
