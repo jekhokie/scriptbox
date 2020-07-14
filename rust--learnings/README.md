@@ -70,6 +70,7 @@ named according to the chapter of the following book, from which the correspondi
 - Generic: Can take multiple forms/left undefined.
 - Trait: Tells Rust compiler about functionality a particular type has and can share with other types (similar to `interfaces`)..
 - Lifetimes: Functionality used to prevent dangling references.
+- Closure: Anonymous function you can save in a variable or pass as arguments to other functions.
 
 ## Starter Syntax
 
@@ -136,6 +137,15 @@ named according to the chapter of the following book, from which the correspondi
 - `assert_ne!(...)`: Test that two items are not equal.
 - `#[should_panic]`: Attribute indicating that a test should panic/throw an exception.
 - `#[ignore]`: Attribute indicating a test should be skipped - added after the `#[test]` attribute.
+- `FnOnce`: Consumes a variable it captures from it's enclosing scope (can be called only once).
+- `FnMut`: Can change the environment because it mutably borrows values.
+- `Fn`: Borrows values from the environment immutably.
+- `move`: Can be used with a closure to force the closure to take ownership of the values it uses (e.g. passing a closure to a new thread and moving its associated data so its owned by the new thread).
+- `collect()`: Execute/evaluate an iterator adapter (such as `map()` or `filter()`).
+- `map()`: Iterator adapter to modify items using an iterator - lazy evaluated.
+- `filter()`: Iterator adapter that returns an item in the iterator if the condition is true, or excludes if false.
+- `.iter()`: Create an iterator on an object (don't take ownership).
+- `.into_iter()`: Create an iterator on an object and take ownership.
 
 ## Other Notes
 
@@ -179,3 +189,8 @@ named according to the chapter of the following book, from which the correspondi
   - Setting up any other configuration.
   - Calling a `run` function in `lib.rs`.
   - Handling the error if `run` returns an error.
+- The first time a closure is called the parameter type is locked in (you must use the same parameter type if calling the closure after the first time).
+- Memoization or lazy evaluation can be accomplished by creating a struct that will hold the closure and resulting value of the closure, only calling the closure if the resulting value is needed and is not already cached.
+- To create an iterator, only need to define an `Item` and implement the `next()` function.
+- Iterator adapters (such as `map()`) are lazy evaluated.
+- Iterators are zero-cost abstractions (abstraction imposes no additional runtime overhead).
