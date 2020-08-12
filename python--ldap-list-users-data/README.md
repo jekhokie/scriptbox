@@ -51,5 +51,18 @@ Execute the query script and a table with the resulting information should be pr
 you configured in `config/settings.yml`:
 
 ```bash
-$ python get_ldap_info.py
+./get_ldap_info.py
+```
+
+There are some additional options available when running the script - see below or use the `-h` argument:
+
+```bash
+# get information about usage
+./get_ldap_info.py -h
+
+# get group information for each user
+./get_ldap_info.py -g
+
+# get debug information as the script runs
+./get_ldap_info.py -d
 ```
