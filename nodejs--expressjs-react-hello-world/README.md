@@ -96,9 +96,9 @@ when local file changes are made (without the need to restart the services each 
 This tutorial was pieced together with some information from the following sites/resources, among others that were likely missed
 in this list:
 
-[Create React Frontend and Node Express Backend...](https://www.freecodecamp.org/news/create-a-react-frontend-a-node-express-backend-and-connect-them-together-c5798926047c/)
-[Skeleton Website](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/skeleton_website)
-[Sequelize Express](https://sequelize.readthedocs.io/en/1.7.0/articles/express/)
-[Sequelize ORM with NodeJS and Express](https://stackabuse.com/using-sequelize-orm-with-nodejs-and-express/)
-[Building a Blog...](https://scotch.io/tutorials/build-a-blog-using-expressjs-and-react-in-30-minutes)
-[Build a Basic CRUD App...](https://developer.okta.com/blog/2018/07/10/build-a-basic-crud-app-with-node-and-react)
+* [Create React Frontend and Node Express Backend...](https://www.freecodecamp.org/news/create-a-react-frontend-a-node-express-backend-and-connect-them-together-c5798926047c/)
+* [Skeleton Website](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/skeleton_website)
+* [Sequelize Express](https://sequelize.readthedocs.io/en/1.7.0/articles/express/)
+* [Sequelize ORM with NodeJS and Express](https://stackabuse.com/using-sequelize-orm-with-nodejs-and-express/)
+* [Building a Blog...](https://scotch.io/tutorials/build-a-blog-using-expressjs-and-react-in-30-minutes)
+* [Build a Basic CRUD App...](https://developer.okta.com/blog/2018/07/10/build-a-basic-crud-app-with-node-and-react)
