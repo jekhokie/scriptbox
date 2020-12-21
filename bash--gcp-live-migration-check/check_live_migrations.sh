@@ -22,7 +22,7 @@ ERROR_COLOR="$(tput setaf 1)"
 INFO_COLOR="$(tput setaf 2)"
 
 # sample file for local file testing
-LOCAL_LOG="test_data/migration_events.json"
+LOCAL_EVENTS="test_data/migration_events.json"
 
 # variables
 migrationEvents=()
@@ -45,58 +45,22 @@ else
     exit 1
 fi
 
+# get shared functions
+source lib/functions.sh
+
 write_output "**START TIME**"
-
-function get_live_migration_events {
-    write_output "Getting live migration events from system_event log..."
-
-    if [ $local_test = true ]; then
-        write_output "Running query locally:"
-
-        # query the local file for live migration events
-        eventsTemp=$(cat $LOCAL_LOG)
-    else
-        write_output "Running query on user-configured GCP project:"
-
-        # get the current date
-        curDate=$(date +"%F")
-
-        # perform a stackdriver query for event logs
-        read -r -d '' logQuery <<EOF
-            logName=projects/${GCP_PROJECT}/logs/cloudaudit.googleapis.com%2Fsystem_event AND
-            resource.type="gce_instance" AND
-            operation.producer="compute.instances.migrateOnHostMaintenance" AND
-            timestamp>="${curDate}"
-EOF
-        eventsTemp=$(gcloud logging read "$logQuery" --project=${GCP_PROJECT} --format="json(timestamp,protoPayload.resourceName)")
-    fi
-
-    # parse query results (if any)
-    migrationEvents=($(echo $eventsTemp | jq -r '.[] | "\(.timestamp)|\(.protoPayload.resourceName)"'))
-}
-
-function print_migration_results {
-    write_output "Parsing list of migrations..."
-    printf "| %-30s | %-30s | %-s\n" "GMT" "LOCAL" "RESOURCE"
-    echo "| ------------------------------ | ------------------------------ | ------------------------------------------------------------------------------------------ |"
-    for migration in "${migrationEvents[@]}"; do
-        gmtDate=${migration%|*}
-        gmtEpochSec="$(date -ujf "%FT%T" ${gmtDate} +'%s' 2>/dev/null)"
-        localDate=$(TZ=$DESIRED_TZ date -jf "%s" $gmtEpochSec)
-        printf "| %-30s | %-30s | %-90s |\n" "${gmtDate}" "${localDate}" "${migration##*|}"
-    done
-    echo "| ------------------------------------------------------------------------------------------------------------------------------------------------------------ |"
-}
 
 ##### MAIN EXECUTION #####
 
 # perform query of system_event log
-get_live_migration_events
+curDate=$(date -j +"%F")
+get_live_migration_events $curDate
 
 # print results of any migrations
 if [[ ${#migrationEvents[@]} > 0 ]]; then
     write_output "List of migration events that have occurred since start of day (GMT):"
-    print_migration_results
+    echo ${#migrationEvents[@]}
+    print_current_day_migration_results
 else
     write_output "No migration events since start of day (GMT)."
 fi

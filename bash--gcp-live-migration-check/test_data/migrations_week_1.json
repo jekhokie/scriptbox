@@ -1,0 +1,74 @@
+[
+  {
+    "protoPayload": {
+      "resourceName": "projects/my-project-1/zones/us-west1-c/instances/some-host-d"
+    },
+    "timestamp": "2020-11-27T23:27:49.783732Z"
+  },
+  {
+    "protoPayload": {
+      "resourceName": "projects/my-project-1/zones/us-west1-c/instances/some-host-d"
+    },
+    "timestamp": "2020-11-27T23:22:49.364365Z"
+  },
+  {
+    "protoPayload": {
+      "resourceName": "projects/my-project-1/zones/us-east4-c/instances/some-host-f"
+    },
+    "timestamp": "2020-11-26T21:49:41.432125Z"
+  },
+  {
+    "protoPayload": {
+      "resourceName": "projects/my-project-1/zones/us-west1-b/instances/some-host-f"
+    },
+    "timestamp": "2020-11-24T19:11:08.631267Z"
+  },
+  {
+    "protoPayload": {
+      "resourceName": "projects/my-project-1/zones/us-west1-c/instances/some-host-d"
+    },
+    "timestamp": "2020-11-24T18:00:33.488634Z"
+  },
+  {
+    "protoPayload": {
+      "resourceName": "projects/my-project-1/zones/us-west1-c/instances/some-host-d"
+    },
+    "timestamp": "2020-11-24T17:57:39.529959Z"
+  },
+  {
+    "protoPayload": {
+      "resourceName": "projects/my-project-1/zones/us-west1-c/instances/some-host-d"
+    },
+    "timestamp": "2020-11-24T16:22:53.399154Z"
+  },
+  {
+    "protoPayload": {
+      "resourceName": "projects/my-project-1/zones/us-west1-c/instances/some-host-a"
+    },
+    "timestamp": "2020-11-24T15:53:52.146573Z"
+  },
+  {
+    "protoPayload": {
+      "resourceName": "projects/my-project-1/zones/us-east4-a/instances/some-host-a"
+    },
+    "timestamp": "2020-11-23T15:50:56.839136Z"
+  },
+  {
+    "protoPayload": {
+      "resourceName": "projects/my-project-1/zones/us-west1-c/instances/some-host-d"
+    },
+    "timestamp": "2020-11-22T14:51:38.018557Z"
+  },
+  {
+    "protoPayload": {
+      "resourceName": "projects/my-project-1/zones/us-west1-c/instances/some-host-b"
+    },
+    "timestamp": "2020-11-21T14:49:36.668275Z"
+  },
+  {
+    "protoPayload": {
+      "resourceName": "projects/my-project-1/zones/us-west1-c/instances/some-host-b"
+    },
+    "timestamp": "2020-11-21T13:19:32.981685Z"
+  }
+]

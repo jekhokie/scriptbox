@@ -1,9 +1,14 @@
 # GCP Live Migration Check
 
-GCP live migrations have been known to be impactful to some workloads. This script queries the
-GCP `system_event` log for all live migration events that have occurred since the start of the
-day (GMT time) and reports a list of local timings and hostnames that had been migrated to help
-with troubleshooting efforts.
+GCP live migrations have been known to be impactful to some workloads. There are multiple pieces
+of functionality in this repository to help with some troubleshooting:
+
+1. `check_live_migrations.sh`: This script queries the GCP `system_event` log for all live migration
+events that have occurred since the start of the current day (GMT time) and reports a list of local
+timings and hostnames that had been migrated to help with troubleshooting efforts.
+2. `live_migration_history.sh`: This script accepts a number of weeks and will query the number of
+GCP live migrations events that have occurred each week previous to the current day, back to the
+number of weeks specified, and print (and optionally graph) the results.
 
 ## Requirements
 
@@ -22,7 +27,8 @@ $ gcloud auth login
 
 ## Required Libraries
 
-The only prerequisite for this script to function is the presence/availability of the `jq` binary.
+* All scripts require the `jq` binary.
+* `live_migration_history.sh` requires `gnuplot` if you wish to plot the results.
 
 ## Usage
 
@@ -35,14 +41,29 @@ $ cp config/settings.sh.sample config/settings.sh
 $ chmod 600 config/settings.sh
 ```
 
-Then, simply execute the script and the GCP project Stackdriver logs will be queried, with information about
-each event printed to the terminal:
+Then, depending on which script you wish to use, ensure the parameters required are passed in - some examples:
 
 ```bash
+# check and print migration events for current day
 $ ./check_live_migrations.sh
+
+# use the local test files instead of querying the GCP API
+$ ./check_live_migrations.sh --test-local
+
+# print historical migration events for the
+# last 6 weeks leading up to current day
+$ ./live_migration_history.sh 6
+
+# print and plot historical migration events for the
+# last 6 weeks leading up to current day
+$ ./live_migration_history.sh 6 --plot
+
+# use the local test files instead of querying the GCP API
+$ ./live_migration_history.sh 6 --test-local
 ```
 
-You can also pass the following command-line switches:
+## Disclaimer
 
-* `--test-local`: Use the local test files rather than interacting with GCP directly (good for local
-debugging/troubleshooting).
+This functionality is ROUGH - function calls and return arguments are kind of all over the place and the
+use of variables is crude at best. This functionality requires a refactor to pretty it up, but serves its
+purpose for the time being, so may never get it.
