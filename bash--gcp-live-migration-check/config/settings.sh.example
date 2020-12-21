@@ -1,0 +1,5 @@
+# the time zone to convert GCP-reported GMT times to
+DESIRED_TZ=America/New_York
+
+# project to query live migration events
+GCP_PROJECT=MYPROJECT
