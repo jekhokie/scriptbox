@@ -59,7 +59,6 @@ get_live_migration_events $curDate
 # print results of any migrations
 if [[ ${#migrationEvents[@]} > 0 ]]; then
     write_output "List of migration events that have occurred since start of day (GMT):"
-    echo ${#migrationEvents[@]}
     print_current_day_migration_results
 else
     write_output "No migration events since start of day (GMT)."

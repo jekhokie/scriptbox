@@ -32,6 +32,9 @@ EOF
 
 function print_current_day_migration_results {
     write_output "Parsing list of migrations..."
+
+    echo "| --------------------------------------------------------------------------------------------------------------------------------------------------------------- |"
+    echo "   -> TOTAL MIGRATIONS: ${#migrationEvents[@]}"
     echo "| --------------------------------------------------------------------------------------------------------------------------------------------------------------- |"
     printf "| %-30s | %-30s | %-93s |\n" "GMT" "LOCAL" "RESOURCE"
     echo "| ------------------------------ | ------------------------------ | --------------------------------------------------------------------------------------------- |"
@@ -46,13 +49,19 @@ function print_current_day_migration_results {
 
 function print_migration_trends {
     write_output "Parsing list of migrations..."
+    numMigrations=0
+
     echo "| ----------------------------------------------------- |"
     printf "| %-30s | %-20s |\n" "DATE RANGE" "# MIGRATIONS"
     echo "| ------------------------------ | -------------------- |"
     for migration in "${migrationTrends[@]}"; do
         dateRange=$(echo "${migration% *}" | sed -e 's/\\n/ -> /')
-        printf "| %-30s | %-20s |\n" "${dateRange}" "${migration##* }"
+        num=${migration##* }
+        numMigrations=$(($numMigrations + $num))
+        printf "| %-30s | %-20s |\n" "${dateRange}" "${num}"
     done
+    echo "| ----------------------------------------------------- |"
+    echo "   -> TOTAL MIGRATIONS: ${numMigrations}"
     echo "| ----------------------------------------------------- |"
 }
 
