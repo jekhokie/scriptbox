@@ -1,0 +1,2 @@
+bootstrap-server: localhost:29092 # endpoint to discover kafka cluster
+topic: test-1                     # topic name that should be produced to/consumed from

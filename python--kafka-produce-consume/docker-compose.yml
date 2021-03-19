@@ -1,0 +1,42 @@
+---
+version: '3.7'
+
+services:
+  zookeeper1:
+    image: confluentinc/cp-zookeeper:6.0.0
+    hostname: zookeeper1
+    container_name: zookeeper1
+    ports:
+      - 2181:2181
+    networks:
+      - kafka
+    environment:
+      ZOOKEEPER_4LW_COMMANDS_WHITELIST: "*"
+      ZOOKEEPER_ALLOW_ANONYMOUS_LOGIN: "yes"
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka1:
+    image: confluentinc/cp-kafka:6.0.0
+    hostname: kafka1-broker1
+    container_name: kafka1-broker1
+    depends_on:
+      - zookeeper1
+    ports:
+      - 29092:29092
+      - 23456:23456
+    networks:
+      - kafka
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper1:2181
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_ADVERTISED_LISTENERS=CLIENT://kafka1-broker1:9092,EXTERNAL://localhost:29092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - KAFKA_JMX_PORT=23456
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+
+networks:
+  kafka:
