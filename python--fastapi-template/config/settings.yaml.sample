@@ -1,2 +1,4 @@
 app:
   environment: test-environment
+  dbtype: SQLITE
+  dbname: fastapi-test.db

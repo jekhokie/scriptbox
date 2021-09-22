@@ -4,3 +4,4 @@ __pycache__
 *.swp
 .env
 config/settings.yaml
+db/*
