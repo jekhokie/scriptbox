@@ -11,6 +11,7 @@ NONE="\033[0m"
 containerImages=(
   log4shell-bind9-service
   log4shell-bind9-interface
+  log4shell-openldap-service
   log4shell-app-2.8.2-vulnerable
 )
 

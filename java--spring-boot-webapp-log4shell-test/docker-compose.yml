@@ -23,6 +23,18 @@ services:
       - log4shell-network
     volumes:
       - bind9-logs:/bind9-logs:ro
+      - openldap-logs:/openldap-logs:ro
+
+  openldap-service:
+    image: log4shell-openldap-service
+    hostname: openldap-service
+    container_name: openldap-service
+    ports:
+      - 389:389
+    networks:
+      - log4shell-network
+    volumes:
+      - openldap-logs:/var/log/openldap
 
   app-2.8.2-vulnerable:
     image: log4shell-app-2.8.2-vulnerable
@@ -39,3 +51,4 @@ networks:
 
 volumes:
   bind9-logs:
+  openldap-logs:

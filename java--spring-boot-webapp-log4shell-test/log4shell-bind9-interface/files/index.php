@@ -10,7 +10,7 @@
   </head>
   <body>
     <div class="container">
-      <h1 class="text-center mt-2">Latest BIND Query Logs</h1>
+      <h1 class="text-center mt-2">Latest BIND Query Logs (Last 10)</h1>
       <hr class="mt-1 mb-1"/>
       <p class="text-center"><strong>NOTE:</strong> Queries are shown in reverse order (newest first/at the top of the table).</p>
 
@@ -30,6 +30,8 @@
         </thead>
         <tbody>
           <?php
+            $NUM_RESULTS = 5;
+
             $data = file_get_contents('/bind9-logs/bind.log');
             $queryMatches = array();
           
@@ -65,6 +67,64 @@
                 echo "  <td>" . $requestedAt . "</td>";
                 echo "  <td>" . $requestor . "</td>";
                 echo "</tr>";
+
+                $i += 1;
+                if ($i >= $NUM_RESULTS) {
+                  break;
+                }
+              }
+            }
+            else{
+             echo "<p>No queries found</p>";
+            }
+          ?>
+        </tbody>
+      </table>
+
+      <h1 class="text-center mt-2">Latest OpenLDAP Query Logs (Last 10)</h1>
+      <hr class="mt-1 mb-1"/>
+      <p class="text-center"><strong>NOTE:</strong> Queries are shown in reverse order (newest first/at the top of the table).</p>
+
+      <table class="table table-striped table-sm table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">Query Record</th>
+            <th scope="col">Requested At</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+            $data = file_get_contents('/openldap-logs/openldap.log');
+            $queryMatches = array();
+          
+            if(preg_match_all("/^.*SRCH.*\$/m", $data, $queryMatches)){
+              foreach (array_reverse($queryMatches[0]) as $match) {
+                $queryRecord = "UNKNOWN";
+                $requestedAt = "UNKNOWN";
+          
+                // parse date
+                $regExp = "/^(.*) openldap-service.*/";
+                $dateMatches = array();
+                if (preg_match($regExp, $match, $dateMatches) ) {
+                  $requestedAt = $dateMatches[1];
+                }
+          
+                // parse query record
+                $regExp = "/.* SRCH (.*) scope.*/";
+                $queryMatches = array();
+                if (preg_match($regExp, $match, $queryMatches) ) {
+                  $queryRecord = $queryMatches[1];
+                }
+          
+                echo "<tr>";
+                echo "  <td>" . $queryRecord . "</td>";
+                echo "  <td>" . $requestedAt . "</td>";
+                echo "</tr>";
+
+                $i += 1;
+                if ($i >= $NUM_RESULTS) {
+                  break;
+                }
               }
             }
             else{
