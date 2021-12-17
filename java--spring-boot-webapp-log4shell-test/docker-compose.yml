@@ -1,0 +1,32 @@
+---
+version: '3.7'
+
+services:
+  bind9-service:
+    image: log4shell-bind9-service
+    hostname: bind9-service
+    container_name: bind9-service
+    ports:
+      - 53:53/udp
+    networks:
+      - log4shell-network
+    volumes:
+      - bind9-logs:/var/log/bind
+
+  bind9-interface:
+    image: log4shell-bind9-interface
+    hostname: bind9-interface
+    container_name: bind9-interface
+    ports:
+      - 80:80
+    networks:
+      - log4shell-network
+    volumes:
+      - bind9-logs:/bind9-logs:ro
+
+networks:
+  log4shell-network:
+    name: log4shell-network
+
+volumes:
+  bind9-logs:
