@@ -11,11 +11,18 @@ NONE="\033[0m"
 containerImages=(
   log4shell-bind9-service
   log4shell-bind9-interface
+  log4shell-app-2.8.2-vulnerable
 )
 
 for containerImage in "${containerImages[@]}"; do
   echo "${YELLOW}Building ${containerImage} container image...${NONE}"
   cd $containerImage/
+
+  # build the java applications if necessary
+  if [[ $containerImage =~ ^log4shell-app-.*$ ]]; then
+    mvn package
+  fi
+
   docker build -t $containerImage .
   if [[ $? -eq 0 ]]; then
     echo "${GREEN}SUCCESS: Done!${NONE}"

@@ -24,6 +24,15 @@ services:
     volumes:
       - bind9-logs:/bind9-logs:ro
 
+  app-2.8.2-vulnerable:
+    image: log4shell-app-2.8.2-vulnerable
+    hostname: app-2.8.2-vulnerable
+    container_name: app-2.8.2-vulnerable
+    ports:
+      - 8880:8080
+    networks:
+      - log4shell-network
+
 networks:
   log4shell-network:
     name: log4shell-network
