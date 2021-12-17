@@ -46,26 +46,31 @@ TODO: HOW TO EXPLOIT
 ### log4j 2.8.2 Vulnerable
 
 Base container that runs the 2.8.2 version of log4j without any mitigation/remediation in place (for pentesting).
+Port: 8880
 
 ### log4j 1.2 JMSAppender Exploit
 
 log4shell-app-1.2-jmsAppender-mitigated
 [Remove JMSAppender Class Mitigation](https://access.redhat.com/security/cve/CVE-2021-4104#cve-details-mitigation)
+Port: 8881
 
 ### log4j 2.8.2 formatMsgNoLookups=true
 
 log4shell-app-2.8.2-formatMsgNoLookups-mitigated
 [formatMsgNoLookups=true Mitigation](https://www.lunasec.io/docs/blog/log4j-zero-day-mitigation-guide/#option-2-enable-formatmsgnolookups)
+Port: 8882
 
 ### log4j 2.8.2 JNDI Lookup Patch
 
 log4shell-app-2.8.2-jndiLookupRemoved-mitigated
 [Remove JNDI Lookups Class Mitigation](https://www.lunasec.io/docs/blog/log4j-zero-day-mitigation-guide/#option-3-jndi-patch)
+Port: 8883
 
 ### log4j 2.8.2 {nolookups}
 
 log4shell-app-2.8.2-nolookups-mitigated
 [Add nolookups to XML Mitigation](https://www.lunasec.io/docs/blog/log4j-zero-day-mitigation-guide/#option-3-jndi-patch)
+Port: 8884
 
 ### log4j 2.16.0 Remediation
 
@@ -73,3 +78,4 @@ log4shell-app-2.8.2-nolookups-mitigated
 
 log4shell-app-2.16.0-remediated
 [Upgrading to 2.16 Remediation](https://www.lunasec.io/docs/blog/log4j-zero-day-mitigation-guide/#option-1-upgrading-to-2160)
+Port: 8885
