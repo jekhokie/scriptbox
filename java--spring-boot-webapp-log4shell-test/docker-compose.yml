@@ -9,7 +9,8 @@ services:
     ports:
       - 53:53/udp
     networks:
-      - log4shell-network
+      log4shell-network:
+        ipv4_address: 10.128.0.2
     volumes:
       - bind9-logs:/var/log/bind
 
@@ -20,10 +21,13 @@ services:
     ports:
       - 80:80
     networks:
-      - log4shell-network
+      log4shell-network:
+        ipv4_address: 10.128.0.3
     volumes:
       - bind9-logs:/bind9-logs:ro
       - openldap-logs:/openldap-logs:ro
+    depends_on:
+      - bind9-service
 
   openldap-service:
     image: log4shell-openldap-service
@@ -32,9 +36,12 @@ services:
     ports:
       - 389:389
     networks:
-      - log4shell-network
+      log4shell-network:
+        ipv4_address: 10.128.0.4
     volumes:
       - openldap-logs:/var/log/openldap
+    depends_on:
+      - bind9-service
 
   app-2.8.2-vulnerable:
     image: log4shell-app-2.8.2-vulnerable
@@ -43,11 +50,22 @@ services:
     ports:
       - 8880:8080
     networks:
-      - log4shell-network
+      log4shell-network:
+        ipv4_address: 10.128.0.5
+    depends_on:
+      - bind9-service
+    volumes:
+      - ${PWD}/files/resolv.conf:/etc/resolv.conf
 
 networks:
   log4shell-network:
     name: log4shell-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.128.0.0/16
+          ip_range: 10.128.0.0/16
+          gateway: 10.128.0.1
 
 volumes:
   bind9-logs:
