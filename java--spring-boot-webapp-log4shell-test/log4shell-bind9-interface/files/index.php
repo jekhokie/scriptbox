@@ -36,6 +36,7 @@
             $queryMatches = array();
           
             if(preg_match_all("/^.*queries.*\$/m", $data, $queryMatches)){
+              $i = 0;
               foreach (array_reverse($queryMatches[0]) as $match) {
                 $queryRecord = "UNKNOWN";
                 $requestedAt = "UNKNOWN";
@@ -98,6 +99,7 @@
             $queryMatches = array();
           
             if(preg_match_all("/^.*SRCH.*\$/m", $data, $queryMatches)){
+              $i = 0;
               foreach (array_reverse($queryMatches[0]) as $match) {
                 $queryRecord = "UNKNOWN";
                 $requestedAt = "UNKNOWN";
