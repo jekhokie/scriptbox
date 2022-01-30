@@ -54,6 +54,15 @@ $ docker-compose up
 If all goes well, you should see many (MANY) logs scroll by. Investigate some of them to check whether all components
 appear healthy/running. You can also use `docker-compose ps` to check whether all instances are up and healthy.
 
+To start, create a Brooklin stream (as of this repo creation, "Create Stream" was not yet implemented). Download the Brooklin
+1.1.0 package, unpackage it, and run the following from the `brooklin-1.1.0` directory:
+
+```bash
+$ bin/brooklin-rest-client.sh -o CREATE -u http://localhost:32311/ -n first-datastream -s "kafka://localhost:29092/test-events1" -p 1 -c kafkaMirroringConnector -t kafkaTransportProvider -m '{"owner":"test-user","system.reuseExistingDestination":"false"}'
+```
+
+The above will create your first datastream, which will be shown in the ReactJS interface in the next step.
+
 ## Start ReactJS Brooklin Management App
 
 **WARNING**: To avoid complexities related to CORS setup and keep focus on the functionality being developed, the
