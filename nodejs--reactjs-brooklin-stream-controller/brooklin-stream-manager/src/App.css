@@ -1,0 +1,4 @@
+button:disabled,
+button[disabled] {
+  opacity: 0.15 !important;
+}
