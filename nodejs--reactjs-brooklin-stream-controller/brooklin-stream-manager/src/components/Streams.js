@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { Link } from "react-router-dom";
 
 class Streams extends Component {
   constructor(props) {
@@ -11,7 +12,6 @@ class Streams extends Component {
     this.delete = this.delete.bind(this);
     this.pause = this.pause.bind(this);
     this.resume = this.resume.bind(this);
-    this.create = this.create.bind(this);
   }
 
   componentDidMount() {
@@ -28,11 +28,6 @@ class Streams extends Component {
           error
         });
       });
-  }
-
-  create() {
-    // TODO: FILLMEIN
-    console.log("TODO: IMPLEMENT THIS");
   }
 
   delete(streamName) {
@@ -137,7 +132,7 @@ class Streams extends Component {
           </thead>
           <tbody>
             {this.state.streams && this.state.streams.map((stream) => (
-              <tr key={stream.metadata.datastreamUUID}>
+              <tr key={stream.name}>
                 <td>{stream.name}</td>
                 <td>{stream.source.connectionString.split("/").pop()}</td>
                 <td>{stream.source.connectionString.split("/")[2]}</td>
@@ -145,10 +140,10 @@ class Streams extends Component {
                 <td>{stream.destination.connectionString.split("/")[2]}</td>
                 <td>{stream.Status}</td>
                 <td>
-                  <button disabled={stream.Status === "READY" ? true : ""} type="button" className="btn pt-0" onClick={(e) => this.resume(stream.name)}>
+                  <button disabled={stream.Status === "READY" || stream.Status == "INITIALIZING" ? true : ""} type="button" className="btn pt-0" onClick={(e) => this.resume(stream.name)}>
                     <i className="fa fa-play text-success" aria-hidden="true"></i>
                   </button>
-                  <button disabled={stream.Status === "READY" ? "" : true} type="button" className="btn pt-0" onClick={(e) => this.pause(stream.name)}>
+                  <button disabled={stream.Status !== "READY" || stream.Status == "INITIALIZING" ? true : ""} type="button" className="btn pt-0" onClick={(e) => this.pause(stream.name)}>
                     <i className="fa fa-pause text-warning" aria-hidden="true"></i>
                   </button>
                   <button type="button" className="btn pt-0" onClick={(e) => this.delete(stream.name)}>
@@ -159,7 +154,10 @@ class Streams extends Component {
             ))}
           </tbody>
         </table>
-        <button className="btn btn-success" type='button' onClick={(e) => this.create(e)}>Add Stream</button>
+
+        <Link to="/addStream">
+          <button className="btn btn-success" type='button'>Add Stream</button>
+        </Link>
       </div>
     )
   }
