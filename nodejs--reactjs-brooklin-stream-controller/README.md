@@ -34,14 +34,15 @@ $ docker build -t brooklin .
 
 You should see the image built, and can check that it exists locally via `docker image ls brooklin`.
 
-## Start ZooKeepers, Kafkas, and Brooklin
+## Start ZooKeeper (2x), Kafka (2x), Kafka REST Proxy, and Brooklin
 
 Now that you have your Brooklin image built, we'll start the ecosystem. The full ecosystem contains 2x Kafka clusters
-which each use their own ZooKeeper instances, and a single Brooklin instance, all on a common Docker network. More
-specific details:
+which each use their own ZooKeeper instances, a Kafka REST Proxy (for REST API interaction with Kafka), and a single
+Brooklin instance, all on a common Docker network. More specific details:
 
 - **kafka1**: Linked to **zookeeper1** (port 2181), exposes publish/consume port 29092 to `localhost`
 - **kafka2**: Linked to **zookeeper2** (port 2182), exposes publish/consume port 29093 to `localhost`
+- **kafka1-rest**: Linked to **kafka1** (port 9092/internal), exposes REST API port 38082 to `0.0.0.0`
 - **brooklin**: Linked to **zookeeper2** (port 2182), uses **kafka2** (port 29093) as destination, exposes datastream
 management port 32311 to `localhost`
 
@@ -54,7 +55,22 @@ $ docker-compose up
 If all goes well, you should see many (MANY) logs scroll by. Investigate some of them to check whether all components
 appear healthy/running. You can also use `docker-compose ps` to check whether all instances are up and healthy.
 
-To start, create a Brooklin stream (as of this repo creation, "Create Stream" was not yet implemented). Download the Brooklin
+At this time, it is expected that Kafka topics will exist in source and destination prior to adding a new stream in Brooklin.
+The easiest way to do this is to download the Kafka binaries and pre-create them - start with 2 in each cluster for testing
+(note that the commands below assume that you have downloaded/unpacked a version of the Kafka tar file and are in the Kafka
+directory):
+
+```bash
+# create first topic in kafka1 and kafka2
+$ bin/kafka-topics.sh --create --topic test-events1 --bootstrap-server localhost:29092
+$ bin/kafka-topics.sh --create --topic test-events1 --bootstrap-server localhost:29093
+
+# create second topic in kafka1 and kafka2
+$ bin/kafka-topics.sh --create --topic test-events2 --bootstrap-server localhost:29092
+$ bin/kafka-topics.sh --create --topic test-events2 --bootstrap-server localhost:29093
+```
+
+Next, create a Brooklin stream (as of this repo creation, "Create Stream" was not yet implemented). Download the Brooklin
 1.1.0 package, unpackage it, and run the following from the `brooklin-1.1.0` directory:
 
 ```bash
@@ -62,6 +78,9 @@ $ bin/brooklin-rest-client.sh -o CREATE -u http://localhost:32311/ -n first-data
 ```
 
 The above will create your first datastream, which will be shown in the ReactJS interface in the next step.
+
+To validate the REST Proxy and the topics you created, navigate to [http://localhost:38082/topics](http://localhost:38082/topics) in
+a browser and you should see the Kafka topics you created in the kafka1 instance.
 
 ## Start ReactJS Brooklin Management App
 
@@ -82,20 +101,7 @@ $ npm install
 $ npm start
 ```
 
-After a few minutes, you should have a web page open with the management interface. At this time, it is expected that
-Kafka topics will exist in source and destination prior to adding a new stream in Brooklin. The easiest way to do this is
-to download the Kafka binaries and pre-create them - start with 2 in each cluster for testing (note that the commands below
-assume that you have downloaded/unpacked a version of the Kafka tar file and are in the Kafka directory):
-
-```bash
-# create first topic in kafka1 and kafka2
-$ bin/kafka-topics.sh --create --topic test-events1 --bootstrap-server localhost:29092
-$ bin/kafka-topics.sh --create --topic test-events1 --bootstrap-server localhost:29093
-
-# create second topic in kafka1 and kafka2
-$ bin/kafka-topics.sh --create --topic test-events2 --bootstrap-server localhost:29092
-$ bin/kafka-topics.sh --create --topic test-events2 --bootstrap-server localhost:29093
-```
+After a few minutes, you should have a web page open with the management interface.
 
 Once the above is complete, feel free to use the stream manager app to create streams, delete them, pause them, etc. using
 the pre-created Kafka topics `test-events1` and `test-events2` created above. Note that the Brooklin instance by default
@@ -153,4 +159,14 @@ and are in the directory of the Kafka package.
 
     ```bash
     $ bin/kafka-console-producer.sh --topic test-events1 --bootstrap-server localhost:29092
+    ```
+
+### Kafka REST Proxy
+
+REST Proxy endpoints [LINK](https://docs.confluent.io/platform/current/kafka-rest/index.html#confluent-rest-apis)
+
+- Get a list of Topics:
+
+    ```bash
+    $ curl http://localhost:38082/topics
     ```

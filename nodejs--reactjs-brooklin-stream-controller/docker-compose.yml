@@ -38,6 +38,22 @@ services:
       - KAFKA_JMX_PORT=23456
       - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
 
+  kafka1-rest:
+    image: confluentinc/cp-kafka-rest:6.0.0
+    hostname: kafka1-rest
+    container_name: kafka1-rest
+    ports:
+      - 38082:38082
+    depends_on:
+      - zookeeper1
+      - kafka1
+    networks:
+      - kafka
+    environment:
+      - KAFKA_REST_BOOTSTRAP_SERVERS=CLIENT://kafka1-broker1:9092
+      - KAFKA_REST_HOST_NAME=kafka1-rest
+      - KAFKA_REST_LISTENERS=http://0.0.0.0:38082
+
   zookeeper2:
     image: confluentinc/cp-zookeeper:6.0.0
     hostname: zookeeper2
