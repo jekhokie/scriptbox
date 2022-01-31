@@ -37,12 +37,13 @@ You should see the image built, and can check that it exists locally via `docker
 ## Start ZooKeeper (2x), Kafka (2x), Kafka REST Proxy, and Brooklin
 
 Now that you have your Brooklin image built, we'll start the ecosystem. The full ecosystem contains 2x Kafka clusters
-which each use their own ZooKeeper instances, a Kafka REST Proxy (for REST API interaction with Kafka), and a single
+which each use their own ZooKeeper instances and REST Proxy (for REST API interaction with Kafka), and a single
 Brooklin instance, all on a common Docker network. More specific details:
 
 - **kafka1**: Linked to **zookeeper1** (port 2181), exposes publish/consume port 29092 to `localhost`
-- **kafka2**: Linked to **zookeeper2** (port 2182), exposes publish/consume port 29093 to `localhost`
 - **kafka1-rest**: Linked to **kafka1** (port 9092/internal), exposes REST API port 38082 to `0.0.0.0`
+- **kafka2**: Linked to **zookeeper2** (port 2182), exposes publish/consume port 29093 to `localhost`
+- **kafka2-rest**: Linked to **kafka2** (port 9093/internal), exposes REST API port 38083 to `0.0.0.0`
 - **brooklin**: Linked to **zookeeper2** (port 2182), uses **kafka2** (port 29093) as destination, exposes datastream
 management port 32311 to `localhost`
 
@@ -148,6 +149,12 @@ you have downloaded, unpackaged, and are in the directory of the Brooklin packag
 
 Various scripts in the Kafka package accomplish tasks for Kafka. These commands expect that you have downloaded, unpackaged,
 and are in the directory of the Kafka package.
+
+- Create a Kafka topic 'test-events1'
+
+    ```bash
+    $ bin/kafka-topics.sh --create --topic test-events1 --bootstrap-server localhost:29092
+    ```
 
 - Read from destination cluster (kafka2)
 

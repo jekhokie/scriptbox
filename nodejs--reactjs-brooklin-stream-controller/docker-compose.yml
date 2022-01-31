@@ -90,6 +90,22 @@ services:
       - KAFKA_JMX_PORT=23457
       - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
 
+  kafka2-rest:
+    image: confluentinc/cp-kafka-rest:6.0.0
+    hostname: kafka2-rest
+    container_name: kafka2-rest
+    ports:
+      - 38083:38083
+    depends_on:
+      - zookeeper2
+      - kafka2
+    networks:
+      - kafka
+    environment:
+      - KAFKA_REST_BOOTSTRAP_SERVERS=CLIENT://kafka2-broker1:9093
+      - KAFKA_REST_HOST_NAME=kafka2-rest
+      - KAFKA_REST_LISTENERS=http://0.0.0.0:38083
+
   brooklin:
     image: brooklin
     hostname: brooklin
