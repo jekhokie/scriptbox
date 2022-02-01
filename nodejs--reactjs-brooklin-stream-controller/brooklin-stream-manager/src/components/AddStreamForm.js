@@ -1,5 +1,11 @@
 import { Component } from 'react';
 
+// TODO: consolidate into single file of vars
+const config = require("../config/config.json");
+const kafka1RESTURL = `http://${config["KAFKA_1_REST_PROXY"]["HOST"]}:${config["KAFKA_1_REST_PROXY"]["PORT"]}`
+const brooklinURL = `http://${config["BROOKLIN"]["HOST"]}:${config["BROOKLIN"]["PORT"]}`;
+const kafka1URI = `kafka://${config["KAFKA_1"]["HOST"]}:${config["KAFKA_1"]["INTERNAL_PORT"]}`
+
 class AddStreamForm extends Component {
   constructor(props) {
     super(props);
@@ -19,7 +25,7 @@ class AddStreamForm extends Component {
   }
 
   componentDidMount() {
-    fetch(`http://localhost:38082/topics`)
+    fetch(`${kafka1RESTURL}/topics`)
       .then(response => response.json())
       .then(response => {
         this.setState({
@@ -41,9 +47,9 @@ class AddStreamForm extends Component {
   create(e) {
     e.preventDefault();
     const streamName = this.state.sourceCluster + "-" + this.state.sourceTopic + "-" + this.state.destCluster;
-    const sourceConnString = "kafka://kafka1-broker1:9092/" + this.state.sourceTopic;
+    const sourceConnString = `${kafka1URI}/${this.state.sourceTopic}`;
 
-    fetch(`http://localhost:32311/datastream/`, {
+    fetch(`${brooklinURL}/datastream/`, {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

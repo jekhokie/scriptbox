@@ -1,6 +1,10 @@
 import { Component } from 'react';
 import { Link } from "react-router-dom";
 
+// TODO: consolidate into single file of vars
+const config = require("../config/config.json");
+const brooklinURL = `http://${config["BROOKLIN"]["HOST"]}:${config["BROOKLIN"]["PORT"]}`;
+
 class Streams extends Component {
   constructor(props) {
     super(props);
@@ -15,7 +19,7 @@ class Streams extends Component {
   }
 
   componentDidMount() {
-    fetch(`http://localhost:32311/datastream/`)
+    fetch(`${brooklinURL}/datastream/`)
       .then(response => response.json())
       .then(response => {
         // this needs to be updated to accommodate pagination
@@ -31,7 +35,7 @@ class Streams extends Component {
   }
 
   delete(streamName) {
-    fetch(`http://localhost:32311/datastream/${streamName}`, {
+    fetch(`${brooklinURL}/datastream/${streamName}`, {
       method: "DELETE",
     })
       .then(response => {
@@ -56,7 +60,7 @@ class Streams extends Component {
   }
 
   resume(streamName) {
-    fetch(`http://localhost:32311/datastream/${streamName}?action=resume`, {
+    fetch(`${brooklinURL}/datastream/${streamName}?action=resume`, {
       method: "POST",
     })
       .then(response => {
@@ -85,7 +89,7 @@ class Streams extends Component {
   }
 
   pause(streamName) {
-    fetch(`http://localhost:32311/datastream/${streamName}?action=pause`, {
+    fetch(`${brooklinURL}/datastream/${streamName}?action=pause`, {
       method: "POST",
     })
       .then(response => {
@@ -96,7 +100,6 @@ class Streams extends Component {
           this.setState({
             streams: this.state.streams.map(stream => {
               if (stream.name === streamName) {
-                console.log("HERE");
                 return { ...stream, Status: "PAUSED" };
               }
               return stream;
