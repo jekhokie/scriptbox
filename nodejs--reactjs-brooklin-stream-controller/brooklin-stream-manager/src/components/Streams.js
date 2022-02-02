@@ -1,7 +1,6 @@
 import { Component } from 'react';
 import { Link } from "react-router-dom";
 
-// TODO: consolidate into single file of vars
 const config = require("../config/config.json");
 const brooklinURL = `http://${config["BROOKLIN"]["HOST"]}:${config["BROOKLIN"]["PORT"]}`;
 

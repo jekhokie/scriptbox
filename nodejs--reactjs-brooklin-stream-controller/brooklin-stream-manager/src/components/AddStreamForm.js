@@ -1,6 +1,5 @@
 import { Component } from 'react';
 
-// TODO: consolidate into single file of vars
 const config = require("../config/config.json");
 
 class AddStreamForm extends Component {
@@ -29,9 +28,7 @@ class AddStreamForm extends Component {
   // get a list of topics for a cluster via REST Proxy
   getTopicList() {
     // TODO: Better error handling in general in here
-    const kafka = config["KAFKAS"].find((kafka) => {
-                    return kafka["ENDPOINT"] === this.state.sourceCluster;
-                  });
+    const kafka = config["KAFKAS"].find((kafka) => { return kafka["ENDPOINT"] === this.state.sourceCluster; });
     const kafkaRESTURL = `http://${kafka["REST_PROXY"]["HOST"]}:${kafka["REST_PROXY"]["PORT"]}`;
 
     fetch(`${kafkaRESTURL}/topics`)
