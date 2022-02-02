@@ -121,7 +121,7 @@ class Streams extends Component {
     return (
       <div>
         <h1 className="display-4">Configured BMM Streams</h1>
-        <table className="table table-striped">
+        <table id="brooklinStreams" className="table table-sm">
           <thead>
             <tr>
               <th>Stream Name</th>

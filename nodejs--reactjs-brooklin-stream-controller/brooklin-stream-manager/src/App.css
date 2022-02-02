@@ -2,3 +2,7 @@ button:disabled,
 button[disabled] {
   opacity: 0.15 !important;
 }
+
+table#brooklinStreams tbody {
+  font-size: 0.9em;
+}
