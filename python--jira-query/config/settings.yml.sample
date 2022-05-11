@@ -1,0 +1,6 @@
+# Jira settings
+jira_server: https://api.my.jira.instance
+jira_user: some_user
+jira_pass: some_password
+jira_project: MYPROJ
+jira_issue_type: Incident
