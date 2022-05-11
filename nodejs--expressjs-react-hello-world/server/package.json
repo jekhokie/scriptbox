@@ -19,7 +19,7 @@
     "pug": "2.0.0-beta11",
     "sequelize": "^6.3.5",
     "sequelize-cli": "^6.2.0",
-    "sqlite3": "^5.0.0"
+    "sqlite3": "^5.0.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.6"
