@@ -29,8 +29,8 @@ Create a configuration file from the sample and specify the values for your spec
 This particular configuration will be our source for the Jira API specifications:
 
 ```bash
-$ cp config/settings.conf.sample config/settings.conf
-# edit the config/settings.conf file for your environment
+$ cp config/settings.yml.sample config/settings.yml
+# edit the config/settings.yml file for your environment
 ```
 
 **WARNING**: You will likely want to lock down the `settings.yml` file as it will contain sensitive
