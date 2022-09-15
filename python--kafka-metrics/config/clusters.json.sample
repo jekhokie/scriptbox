@@ -1,0 +1,14 @@
+{
+  "locations":
+  [
+    { "name": "SOMEWHERE",
+      "clusters": [
+        { "name": "CLUSTER1",
+          "nodes": 30,
+          "per_node_storage_gb": 3200,
+          "per_node_per_mo_cost": 313.00
+        }
+      ]
+    }
+  ]
+}

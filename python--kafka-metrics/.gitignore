@@ -6,3 +6,4 @@
 
 # ignore the environment-specific configuration settings
 config/settings.yml
+config/clusters.json

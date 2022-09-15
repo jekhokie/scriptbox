@@ -15,6 +15,7 @@
 
 import json
 import math
+import re
 import yaml
 from operator import itemgetter
 from os.path import exists
@@ -26,6 +27,11 @@ with open('config/settings.yml', 'r') as yml:
 # check that the logdirs JSON file exists - else fail
 if not exists(config["log_dirs_file"]):
     raise Exception("The JSON file containing the log dirs info '{}' does not exist".format(config["log_dirs_file"]))
+    exit(1)
+
+# check that the config for Kafka clusters exists
+if not exists(config["kafka_cluster_json"]):
+    raise Exception("The JSON file containing the kafka cluster info '{}' does not exist".format(config["kafka_cluster_json"]))
     exit(1)
 
 # some configurations for size conversions
@@ -47,9 +53,31 @@ def bytes_to_readable(size_bytes):
 
     return converted_size, size_measure
 
+def get_cluster_info():
+    '''
+    Parse the JSON of configured Kafka cluster information globally
+    '''
+
+    # load from json
+    with open(config["kafka_cluster_json"], "r") as f:
+        clusters = json.load(f)
+
+    cluster_info = []
+    for location in clusters["locations"]:
+        for cluster in location["clusters"]:
+            monthly_cost = float(cluster["nodes"] * cluster["per_node_per_mo_cost"])
+            total_storage_gb = cluster["nodes"] * cluster["per_node_storage_gb"]
+            per_gb_cost = monthly_cost / total_storage_gb
+            cluster_info.append({
+                "name": cluster["name"],
+                "per_gb_per_mo_cost": per_gb_cost
+            })
+
+    return cluster_info
+
 def parse_log_dirs():
     '''
-    Parse the JSON file containing the partition logs for the topics captured
+    Parse the JSON file containing the partition logs for the topics returned by kafka-log-dirs.sh
     '''
 
     topic_list = []
@@ -80,10 +108,14 @@ def parse_log_dirs():
     # sort order the list for easier parsing
     return sorted(topic_list, key=itemgetter("size"), reverse=True)
 
-def print_statistics(topic_list):
+def print_statistics(topic_list, cluster_info):
     '''
     Print interesting statistics about the topics captured
     '''
+
+    per_gb_cost = cluster_info[0]["per_gb_per_mo_cost"]
+    cluster_name = cluster_info[0]["name"]
+    print(per_gb_cost)
 
     # top 10 largest topics and associated sizes
     print("Cluster: {}".format(config["kafka_cluster"]))
@@ -93,8 +125,18 @@ def print_statistics(topic_list):
     print("Note: This is total size, including replicated data (RF)")
     for topic in topic_list[:10]:
         if topic["size"] != 0:
+            size_gb = topic["size"] / 1024.0 / 1024.0 / 1024.0
+
+            # cost for both storage of raw data (percent of total cluster) plus egress,
+            # which is .01 per GB egress - RF=3 means 2/3 of total size times 2*.01
+            cost_per_month = (size_gb * per_gb_cost) + ((2.0/3.0) * size_gb * 0.02)
+            cost_per_year = cost_per_month * 12
+
+            # other useful stats
             topic_size, measure = bytes_to_readable(topic["size"])
-            print("    {} {} | {}".format(topic_size, measure, topic["name"]))
+
+            # print info
+            print("    ${:.2f}/mo (${:.2f}/yr)| {} {} | {}".format(cost_per_month, cost_per_year, topic_size, measure, topic["name"]))
 
     print("~~~~~~~~~~~~~~~~~")
 
@@ -122,8 +164,9 @@ def main():
     Main execution method
     '''
 
+    cluster_info = get_cluster_info()
     topic_list = parse_log_dirs()
-    print_statistics(topic_list)
+    print_statistics(topic_list, cluster_info)
 
 if __name__ == '__main__':
     main()

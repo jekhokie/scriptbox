@@ -1,3 +1,4 @@
 # query script settings
 kafka_cluster: My Test Cluster Name
 log_dirs_file: cache/logdirs.json
+kafka_cluster_json: config/clusters.json
