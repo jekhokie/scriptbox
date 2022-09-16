@@ -9,7 +9,7 @@ jira==3.2.0
 keyring==23.5.0
 kiwisolver==1.4.2
 numpy==1.22.3
-oauthlib==3.2.0
+oauthlib==3.2.1
 packaging==21.3
 pandas==1.4.2
 Pillow==9.1.0
